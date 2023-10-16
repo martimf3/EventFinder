@@ -1,4 +1,4 @@
-package com.example.eventfinder
+package com.example.eventfinder.ui.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
