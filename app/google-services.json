@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "650001146183",
+    "project_id": "projetodecm",
+    "storage_bucket": "projetodecm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:650001146183:android:ca80fe469010d3a1f8ec62",
+        "android_client_info": {
+          "package_name": "com.example.eventfinder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5m6ETjvSUK5ns6AQ9rC_ZY4YrpSYuLz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
