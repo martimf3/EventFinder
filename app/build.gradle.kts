@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
@@ -77,4 +76,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation ("androidx.core:core-ktx:1.7.0")
+    implementation ("androidx.activity:activity-ktx:1.4.0")
+    implementation ("androidx.fragment:fragment-ktx:1.6.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
+    implementation ("com.google.android.gms:play-services-location:18.0.0")
+    implementation ("com.google.maps:google-maps-services:0.18.0")
+
 }
