@@ -42,8 +42,8 @@ fun HomeScreen(navController: NavController) {
         Button(
             onClick = {
                 locationService.getLastLocation { location ->
-                    locationState.value = location
                     if (location != null) {
+                        locationState.value = location
                         val latitude = location.latitude
                         val longitude = location.longitude
                         locationText.value = "Latitude: $latitude, Longitude: $longitude"
@@ -57,6 +57,23 @@ fun HomeScreen(navController: NavController) {
                 .fillMaxWidth()
         ) {
             Text(text = "Get Current Location")
+        }
+
+        Button(
+            onClick = {
+                locationService.getCitiesWithinRadius(locationState.value, 100.0) { cities ->
+                    if (cities.isNotEmpty()) {
+                        locationText.value = "Cities within 100km:\n${cities.joinToString("\n")}"
+                    } else {
+                        locationText.value = "No cities found within 100km."
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Get Cities Within 100km")
         }
 
         // Display the location text
