@@ -7,9 +7,11 @@ import com.example.eventfinder.navigation.MainNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val context = MyApplication.applicationContext()
         super.onCreate(savedInstanceState)
         setContent {
             MainNavigation()
+
         }
     }
 }
