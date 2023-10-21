@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">EventFinder</string>
     <string name="title_activity_login">Login</string>
+    <string name="web_client_id">650001146183-p6ptortcck43qb5balifb55fcpe4tt1c.apps.googleusercontent.com</string>
 </resources>

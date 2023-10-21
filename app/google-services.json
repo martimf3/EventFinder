@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "650001146183",
+    "firebase_url": "https://projetodecm-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "projetodecm",
     "storage_bucket": "projetodecm.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.eventfinder"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "650001146183-em243l634de34va92n8bi1274ol9ogqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.eventfinder",
+            "certificate_hash": "bd7a12cce009d4a5ea9976be213a7ca835643c01"
+          }
+        },
+        {
+          "client_id": "650001146183-p6ptortcck43qb5balifb55fcpe4tt1c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC5m6ETjvSUK5ns6AQ9rC_ZY4YrpSYuLz0"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "650001146183-p6ptortcck43qb5balifb55fcpe4tt1c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
