@@ -41,16 +41,26 @@ fun HomeScreen(navController: NavController) {
 
         Button(
             onClick = {
-                locationService.getLastLocation { location ->
-                    if (location != null) {
-                        locationState.value = location
-                        val latitude = location.latitude
-                        val longitude = location.longitude
-                        locationText.value = "Latitude: $latitude, Longitude: $longitude"
-                    } else {
-                        locationText.value = "Location not available"
+                locationService.getLastLocation(object : LocationService.LocationCallback {
+                    override fun onLocationResult(location: Location?) {
+                        if (location != null) {
+                            locationState.value = location
+                            val latitude = location.latitude
+                            val longitude = location.longitude
+                            locationText.value = "Latitude: $latitude, Longitude: $longitude"
+                        } else {
+                            locationText.value = "Location not available"
+                        }
                     }
-                }
+
+                    override fun onCitiesWithinRadiusResult(cityNames: List<String>) {
+                        // Not needed in this case, can be left empty
+                    }
+
+                    override fun onError(errorMessage: String) {
+                        // Handle errors if necessary
+                    }
+                })
             },
             modifier = Modifier
                 .padding(16.dp)
@@ -61,12 +71,30 @@ fun HomeScreen(navController: NavController) {
 
         Button(
             onClick = {
-                locationService.getCitiesWithinRadius(locationState.value, 100.0) { cities ->
-                    if (cities.isNotEmpty()) {
-                        locationText.value = "Cities within 100km:\n${cities.joinToString("\n")}"
-                    } else {
-                        locationText.value = "No cities found within 100km."
-                    }
+                if (locationState.value != null) {
+                    locationService.getCitiesWithinRadius(
+                        locationState.value!!,
+                        50.0,
+                        object : LocationService.LocationCallback {
+                            override fun onLocationResult(location: Location?) {
+                                // Not needed in this case, can be left empty
+                            }
+
+                            override fun onCitiesWithinRadiusResult(cityNames: List<String>) {
+                                if (cityNames.isNotEmpty()) {
+                                    locationText.value = "Cities within 100km:\n${cityNames.joinToString("\n")}"
+                                } else {
+                                    locationText.value = "No cities found within 100km."
+                                }
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                // Handle errors if necessary
+                            }
+                        }
+                    )
+                } else {
+                    locationText.value = "Location not available. Please get the current location first."
                 }
             },
             modifier = Modifier
