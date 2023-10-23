@@ -1,18 +1,15 @@
 package com.example.eventfinder
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,8 +19,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
 import com.example.eventfinder.navigation.MainNavigation
+import com.example.eventfinder.ui.screens.HomeScreen
+import com.example.eventfinder.ui.screens.ProfileScreen
 import com.example.eventfinder.ui.screens.SignInScreen
-import com.example.eventfinder.ui.theme.EventFinderTheme
+import com.example.eventfinder.ui.screens.TestePage
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.navigation.MainNavigation
@@ -41,11 +40,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "sign_in" ){
+
+                // SIGN IN NAVBAR
+
                 composable("sign_in") {
 
                     val viewModel = viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
-
                     val launcher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.StartIntentSenderForResult(),
                         onResult = { result ->
@@ -67,9 +68,12 @@ class MainActivity : ComponentActivity() {
                                 "Sign In Successful",
                                 Toast.LENGTH_LONG
                             ).show()
+                            navController.navigate("home")
+
                         }
                     }
                     SignInScreen(
+                        navController,
                         state = state,
                         onSignInClick = {
                             lifecycleScope.launch {
@@ -86,8 +90,45 @@ class MainActivity : ComponentActivity() {
 
                 }
 
+                //SIGN OUT NAVBAR
+                composable("profile"){
+                    ProfileScreen(
+                        navController,
+                        userData = googleAuthUiClient.getSignedInUser(),
+                        onSignOut = {
+                            lifecycleScope.launch {
+                                Log.d("app", "Click")
+                                googleAuthUiClient.signOut()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Signed Out",
+                                    Toast.LENGTH_LONG
+                                    ).show()
+                                navController.navigate("sign_in")
+
+                           }
+
+                        }
+                   )
+
+                }
+
+                //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
+                composable("home"){
+                    HomeScreen(navController)
 
 
+                }
+                // Teste Navegacao da Aplicacao
+                composable("location"){
+                    TestePage("Random",navController)
+                }
+
+                // Sing Up With Email
+                composable("sign_up")
+                {
+
+                }
             }
             MainNavigation()
         }
