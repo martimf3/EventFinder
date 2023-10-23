@@ -25,19 +25,19 @@ import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.TestePage
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import com.example.eventfinder.navigation.MainNavigation
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
-
         )
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        val context = MyApplication.applicationContext()
         super.onCreate(savedInstanceState)
         setContent {
-
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "sign_in" ){
 
@@ -130,8 +130,8 @@ class MainActivity : ComponentActivity() {
 
                 }
             }
+            MainNavigation()
         }
     }
 }
-
 
