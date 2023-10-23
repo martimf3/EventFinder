@@ -2,11 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-
-
 }
-
-
 android {
     namespace = "com.example.eventfinder"
     compileSdk = 34
@@ -53,9 +49,7 @@ android {
         }
     }
 }
-
 dependencies {
-
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
