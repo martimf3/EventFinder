@@ -22,7 +22,7 @@ class LocationService(private val context: Context) {
         LocationServices.getFusedLocationProviderClient(context)
     private val locationPermission = Manifest.permission.ACCESS_FINE_LOCATION
     private val apiKey =
-        "AIzaSyBrZ2TnRqhDx2PmJrpRbpNL-T_GCaTMChw" // Replace with your Google Maps API Key
+        "**************************" // Replace with your Google Maps API Key
 
     interface LocationCallback {
         fun onLocationResult(location: Location?)
