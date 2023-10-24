@@ -3,6 +3,7 @@ package com.example.eventfinder.auth.googleauth.sign_in
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.example.eventfinder.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -46,7 +47,9 @@ class GoogleAuthUiClient (
                     UserData(
                         userId = uid,
                         username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePictureUrl = photoUrl?.toString(),
+                        userEmail = email,
+                        userPhoneNumber =  phoneNumber
                     )
                 },
                 errorMessage = null
@@ -62,13 +65,19 @@ class GoogleAuthUiClient (
     }
 
     suspend fun signOut(){
+        Log.d("app", "Execucao da funcao signOut")
         try {
+
             oneTapClient.signOut().await()
+            Log.d("app", "Desconectado do google")
             auth.signOut()
+            Log.d("app", "Desconectado da Firebase")
 
         }catch (e: Exception){
             e.printStackTrace()
             if(e is CancellationException) throw e
+
+            Log.d("app", "Erro: ${e.message}")
 
         }
     }
@@ -77,7 +86,10 @@ class GoogleAuthUiClient (
         UserData(
             userId = uid,
             username = displayName,
-            profilePictureUrl = photoUrl?.toString()
+            profilePictureUrl = photoUrl?.toString(),
+            userEmail = email,
+            userPhoneNumber = phoneNumber
+
         )
     }
     private fun buildSignInRequest(): BeginSignInRequest{
