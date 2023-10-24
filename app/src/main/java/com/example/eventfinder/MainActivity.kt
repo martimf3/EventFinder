@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
 
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home"){
-                    HomeScreen(navController)
+                  HomeScreen(navController)
 
 
                 }
