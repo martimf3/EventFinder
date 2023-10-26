@@ -89,7 +89,6 @@ fun SignInScreen(
                 modifier = Modifier
                     )
 
-
         {
             Text(text="Google Sing-In")
         }

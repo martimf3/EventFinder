@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.example.eventfinder.MyApplication
 import com.example.eventfinder.location.LocationService
 
+
 @Composable
 
 fun HomeScreen(
@@ -49,8 +50,6 @@ fun HomeScreen(
     
 
     }
-    
-
 
     Column {
         Row(

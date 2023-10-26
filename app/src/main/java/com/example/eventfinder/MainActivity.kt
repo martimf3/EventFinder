@@ -26,7 +26,7 @@ import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.TestePage
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
-import com.example.eventfinder.navigation.MainNavigation
+import com.example.eventfinder.data.api.ticketMaster.*
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -57,6 +57,9 @@ class MainActivity : ComponentActivity() {
                                         intent = result.data ?: return@launch
                                     )
                                     viewModel.onSignInResult(signInResult)
+
+
+
                                 }
                             }
                         }
@@ -116,8 +119,18 @@ class MainActivity : ComponentActivity() {
 
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home"){
-                  HomeScreen(navController)
+                    GetEvents { eventData ->
+                        if (eventData != null) {
+                            // Aqui você tem acesso à lista de eventos e pode fazer o que quiser com ela
+                            for (event in eventData) {
+                                println("Event ID: ${event.id}, Event Name: ${event.name}")
+                            }
+                        } else {
+                            println("Failed to retrieve event data.")
+                        }
+                    }
 
+                    HomeScreen(navController)
 
                 }
                 // Teste Navegacao da Aplicacao
