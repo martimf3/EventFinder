@@ -10,7 +10,6 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,7 +25,6 @@ import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.TestePage
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
-import com.example.eventfinder.data.api.ticketMaster.*
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -119,19 +117,7 @@ class MainActivity : ComponentActivity() {
 
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home"){
-                    GetEvents { eventData ->
-                        if (eventData != null) {
-                            // Aqui você tem acesso à lista de eventos e pode fazer o que quiser com ela
-                            for (event in eventData) {
-                                println("Event ID: ${event.id}, Event Name: ${event.name}")
-                            }
-                        } else {
-                            println("Failed to retrieve event data.")
-                        }
-                    }
-
                     HomeScreen(navController)
-
                 }
                 // Teste Navegacao da Aplicacao
                 composable("location"){
