@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.eventfinder"
-        minSdk = 34
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -68,8 +68,8 @@ dependencies {
     //Carregar imagens Remotamente (Fotos-Perfil)
     implementation("io.coil-kt:coil-compose:2.2.2")
     //Dependencias FireBase
-    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.9.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.2.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-auth:22.2.0")
@@ -102,7 +102,7 @@ dependencies {
     implementation ("com.google.maps:google-maps-services:0.18.0")
     implementation ("com.google.android.libraries.places:places:3.2.0")
     implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation ("io.coil-kt:coil-compose:2.2.2")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
