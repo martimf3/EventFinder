@@ -1,5 +1,4 @@
 package com.example.eventfinder
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -53,6 +52,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.ui.screens.EventListScreen
+
 
 data class BottomNavigationItem(
     val title: String,
@@ -273,11 +273,14 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
+                
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
-                composable("home") {
-                    HomeScreen(navController)
 
+                composable("home"){
+
+                    HomeScreen(navController)
                 }
+                
                 // Teste Navegacao da Aplicacao
                 composable("location") {
 
