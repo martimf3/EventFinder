@@ -9,7 +9,7 @@ fun GetEvents(location: Location, radius: Int, callback: (List<EventData>?) -> U
     val context = MyApplication.applicationContext()
     val locationService = LocationService(context)
 
-    val apiKey = "QUERIAS"
+    val apiKey = "Querias"
     val eventSearch = TicketmasterEventSearch(apiKey)
     val latitude = location.latitude
     val longitude = location.longitude
