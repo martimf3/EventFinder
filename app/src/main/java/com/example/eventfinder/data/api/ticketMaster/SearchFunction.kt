@@ -1,19 +1,14 @@
 package com.example.eventfinder.data.api.ticketMaster
 
-import android.location.Location
-import com.example.eventfinder.MyApplication
 import com.example.eventfinder.data.models.EventData
-import com.example.eventfinder.location.LocationService
 
-fun GetEvents(location: Location, radius: Int, callback: (List<EventData>?) -> Unit)  {
-    val context = MyApplication.applicationContext()
-    val locationService = LocationService(context)
+fun GetEvents( callback: (List<EventData>?) -> Unit)  {
 
     val apiKey = "Querias"
     val eventSearch = TicketmasterEventSearch(apiKey)
-    val latitude = location.latitude
-    val longitude = location.longitude
-    val radius = radius
+    val latitude = 37.7749
+    val longitude = -122.4194
+    val radius = 10
     var eventList: List<EventData> = listOf()
 
     eventSearch.searchEvents(latitude, longitude, radius) { eventData ->
