@@ -20,15 +20,7 @@ import androidx.navigation.NavController
 import com.example.eventfinder.MyApplication
 import com.example.eventfinder.location.LocationService
 
-data class BottomNavigationItem(
-    val title: String,
-    val route: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val hasNews: Boolean,
-    val badgeCount: Int? = null
-)
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 
 fun HomeScreen(
@@ -67,26 +59,7 @@ fun HomeScreen(
                 }
 
                 Button(onClick = {
-                    locationService.getLastLocation(object : LocationService.LocationCallback {
-                        override fun onLocationResult(location: Location?) {
-                            if (location != null) {
-                                // Handle the retrieved location her
-                                GetEvents(location, 100) { eventData ->
-                                    if (eventData != null) {
-                                        print(eventData.count())
-                                    } else {
-                                        // Handle the case where event data retrieval fails
-                                        println("Error retrieving events list")
-                                    }
-                                }
-                            } else {
-                                println("Localização não disponivel")
-                            }
-                        }
-                        override fun onError(errorMessage: String) {
-                            println("Erro ao ir buscar a localização atual")
-                        }
-                    })
+
                 }) {
                     Text(text = "Search Events")
                 }
