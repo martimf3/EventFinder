@@ -51,7 +51,7 @@ fun HomeScreen(
                 }
 
                 Button(onClick = {
-                    locationService.getLastLocation(object : LocationService.LocationCallback {
+                    /*locationService.getLastLocation(object : LocationService.LocationCallback {
                         override fun onLocationResult(location: Location?) {
                             if (location != null) {
                                 // Handle the retrieved location her
@@ -70,7 +70,7 @@ fun HomeScreen(
                         override fun onError(errorMessage: String) {
                             println("Erro ao ir buscar a localização atual")
                         }
-                    })
+                    })*/
                 }) {
                     Text(text = "Search Events")
                 }
