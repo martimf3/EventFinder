@@ -4,7 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
+import com.example.eventfinder.ui.screens.HomeScreen
+import com.example.eventfinder.ui.screens.TestePage
 
 
 import com.example.eventfinder.auth.*
@@ -17,7 +18,9 @@ fun MainNavigation() {
         composable("home") {
 
         }
-
+        composable("testepage") {
+            TestePage("parametro random", navController)
+        }
     }
 }
 
