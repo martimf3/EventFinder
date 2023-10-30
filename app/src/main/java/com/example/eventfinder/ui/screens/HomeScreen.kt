@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eventfinder.MyApplication
@@ -40,6 +41,7 @@ fun HomeScreen(navController: NavController) {
                 Text(text = "Menu")
             }
         }
+
         Column {
             Row(
                 modifier = Modifier
@@ -71,6 +73,7 @@ fun HomeScreen(navController: NavController) {
                                 println("Localização não disponivel")
                             }
                         }
+
                         override fun onError(errorMessage: String) {
                             println("Erro ao ir buscar a localização atual")
                         }
@@ -92,6 +95,41 @@ fun HomeScreen(navController: NavController) {
                 }
             }
         }
+    }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+
+            Button(onClick = {
+                navController.navigate("profile")
+            }) {
+                Text(text = "Profile")
+            }
+
+            Button(onClick = { navController.navigate("location") }) {
+                Text(text = "Location ")
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "WishList")
+
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "Wallet")
+
+            }
+
+
+        }
+
     }
 }
 
