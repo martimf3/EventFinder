@@ -8,35 +8,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,10 +22,9 @@ import com.example.eventfinder.navigation.MainNavigation
 import com.example.eventfinder.ui.screens.HomeScreen
 import com.example.eventfinder.ui.screens.ProfileScreen
 import com.example.eventfinder.ui.screens.SignInScreen
+import com.example.eventfinder.ui.screens.TestePage
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
-import com.example.eventfinder.data.api.ticketMaster.*
-import com.example.eventfinder.ui.screens.EventListScreen
 
 data class BottomNavigationItem(
     val title: String,
@@ -75,127 +47,11 @@ class MainActivity : ComponentActivity() {
         val context = MyApplication.applicationContext()
         super.onCreate(savedInstanceState)
         setContent {
-
-            // VARIAVEIS
             val navController = rememberNavController()
-            var selectedItemIndex by rememberSaveable {
-                mutableStateOf(0)
-            }
-            var isLoggedIn by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            val items = listOf(
-                BottomNavigationItem(
-                    title = "Home",
-                    route = "home",
-                    selectedIcon = Icons.Filled.Home,
-                    unselectedIcon = Icons.Outlined.Home,
-                    hasNews = false,
-                ),
-                BottomNavigationItem(
-                    title = "Location",
-                    route = "location",
-                    selectedIcon = Icons.Filled.LocationOn,
-                    unselectedIcon = Icons.Outlined.LocationOn,
-                    hasNews = false,
-                ),
-                BottomNavigationItem(
-                    title = "WishList",
-                    route = "wishList",
-                    selectedIcon = Icons.Filled.Favorite,
-                    unselectedIcon = Icons.Outlined.FavoriteBorder,
-                    hasNews = false,
-                    badgeCount = 3,
-                ),
-                BottomNavigationItem(
-                    title = "Settings",
-                    route = "Profile",
-                    selectedIcon = Icons.Filled.Settings,
-                    unselectedIcon = Icons.Outlined.Settings,
-                    hasNews = true,
-                ),
-
-
-                )
-
-
-
-            if (isLoggedIn) {
-                Scaffold(
-                    bottomBar = {
-
-                        NavigationBar() {
-                            items.forEachIndexed { index, item ->
-                                NavigationBarItem(
-                                    selected = selectedItemIndex == index,
-                                    onClick = {
-                                        selectedItemIndex = index
-                                        navController.navigate(item.route)
-                                    },
-                                    label = {
-                                        Text(text = item.title)
-                                    },
-                                    icon = {
-                                        BadgedBox(
-                                            badge = {
-                                                if (item.badgeCount != null) {
-
-                                                    Badge {
-                                                        Text(text = item.badgeCount.toString())
-                                                    }
-                                                } else if (item.hasNews) {
-                                                    Badge()
-                                                }
-
-                                            }
-                                        ) {
-                                            Icon(
-                                                imageVector =
-                                                if (index == selectedItemIndex) {
-                                                    item.selectedIcon
-                                                } else item.unselectedIcon,
-                                                contentDescription = item.title
-
-                                            )
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                    }
-
-                ) { paddingValues ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-
-                    }
-                }
-            }
-
-
-
-            NavHost(navController = navController, startDestination = "distinction") {
-
-
-                composable("distinction") {
-
-                    if (isLoggedIn) {
-                        navController.navigate("home")
-                    }
-
-                    if(!isLoggedIn){
-                        navController.navigate("sign_in")
-                    }
-
-                }
+            NavHost(navController = navController, startDestination = "sign_in" ){
 
                 // SIGN IN NAVBAR
+
                 composable("sign_in") {
 
                     val viewModel = viewModel<SignInViewModel>()
@@ -211,14 +67,14 @@ class MainActivity : ComponentActivity() {
                                     viewModel.onSignInResult(signInResult)
 
 
+
                                 }
                             }
                         }
 
                     )
-                    LaunchedEffect(key1 = state.isSignInSuccessful) {
-                        if (state.isSignInSuccessful) {
-                            isLoggedIn = true
+                    LaunchedEffect(key1 = state.isSignInSuccessful ){
+                        if (state.isSignInSuccessful){
                             Toast.makeText(
                                 applicationContext,
                                 "Sign In Successful",
@@ -247,10 +103,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 //SIGN OUT NAVBAR
-                composable("profile") {
-                    val viewModel = viewModel<SignInViewModel>()
-                    val state by viewModel.state.collectAsStateWithLifecycle()
-
+                composable("profile"){
                     ProfileScreen(
                         navController,
                         userData = googleAuthUiClient.getSignedInUser(),
@@ -262,16 +115,14 @@ class MainActivity : ComponentActivity() {
                                     applicationContext,
                                     "Signed Out",
                                     Toast.LENGTH_LONG
-                                ).show()
-                                if(!state.isSignInSuccessful){
-                                    isLoggedIn = false
-                                }
+                                    ).show()
                                 navController.navigate("sign_in")
 
-                            }
+                           }
 
                         }
-                    )
+                   )
+
                 }
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home") {
@@ -279,12 +130,8 @@ class MainActivity : ComponentActivity() {
 
                 }
                 // Teste Navegacao da Aplicacao
-                composable("location") {
-
-                }
-
-                composable("wishList") {
-
+                composable("location"){
+                    TestePage("Random",navController)
                 }
 
                 // Sing Up With Email
@@ -292,13 +139,9 @@ class MainActivity : ComponentActivity() {
                 {
 
                 }
-
             }
-
             MainNavigation()
         }
     }
 }
-
-
 

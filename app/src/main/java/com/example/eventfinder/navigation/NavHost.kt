@@ -8,6 +8,10 @@ import androidx.navigation.compose.rememberNavController
 
 
 import com.example.eventfinder.auth.*
+import com.example.eventfinder.auth.googleauth.sign_in.SignInState
+import com.example.eventfinder.ui.screens.HomeScreen
+import com.example.eventfinder.ui.screens.SignInScreen
+import com.example.eventfinder.ui.screens.TestePage
 @Composable
 
 fun MainNavigation() {
