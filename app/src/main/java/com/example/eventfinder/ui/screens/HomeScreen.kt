@@ -1,11 +1,9 @@
 package com.example.eventfinder.ui.screens
 
-import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -14,30 +12,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.eventfinder.MyApplication
-import com.example.eventfinder.data.api.ticketMaster.GetEvents
-import com.example.eventfinder.location.LocationService
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    val context = MyApplication.applicationContext()
-    val locationService = LocationService(context)
-    Column(
-        modifier = Modifier.padding(50.dp)
+
+fun HomeScreen(
+    navController: NavController
+) {
+
+    Column(modifier = Modifier
+        .padding(50.dp),
+
     ) {
         Row(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize(),
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceEvenly
+
         ) {
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            ) {
+            Button(onClick = { /*TODO*/ }) {
                 Text(text = "Menu")
+
             }
         }
         Column {
@@ -91,8 +87,25 @@ fun HomeScreen(navController: NavController) {
                     Text(text = "Wallet")
                 }
             }
-        }
-    }
-}
 
+            Button(onClick = { navController.navigate("location") }) {
+                Text(text = "Location ")
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "WishList")
+
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "Wallet")
+
+            }
+
+
+        }
+
+    }
+
+}
 
