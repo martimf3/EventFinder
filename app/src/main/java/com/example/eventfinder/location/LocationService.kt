@@ -3,71 +3,76 @@ package com.example.eventfinder.location
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
-import android.os.AsyncTask
 import androidx.core.content.ContextCompat
-import com.example.eventfinder.utils.LocationUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnCompleteListener
+import java.io.IOException
+import java.util.Locale
 
 class LocationService(private val context: Context) {
-    private val fusedLocationClient: FusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
+    private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     private val locationPermission = Manifest.permission.ACCESS_FINE_LOCATION
-    private val apiKey =
-        "**************************" // Replace with your Google Maps API Key
+    private val geocoder = Geocoder(context, Locale.getDefault())
 
-    interface LocationCallback {
-        fun onLocationResult(location: Location?)
-        fun onError(errorMessage: String)
+
+    fun getLastLocation(callback: (Location?) -> Unit) {
+        if (ContextCompat.checkSelfPermission(context, locationPermission) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation
+                .addOnCompleteListener(OnCompleteListener { task ->
+                    if (task.isSuccessful && task.result != null) {
+                        callback(task.result)
+                    } else {
+                        callback(null)
+                    }
+                })
+        } else {
+            callback(null)
+        }
     }
 
-    inner class LocationAsyncTask(private val callback: LocationCallback) :
-        AsyncTask<Void, Void, Location>() {
-        override fun doInBackground(vararg params: Void?): Location? {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    locationPermission
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                if (LocationUtils.isLocationEnabled(context)) {
-                    try {
-                        // Retrieve location asynchronously
-                        fusedLocationClient.lastLocation
-                            .addOnSuccessListener { location ->
-                                // Successfully retrieved the location
-                                callback.onLocationResult(location)
+    fun getCitiesWithinRadius(location: Location?, radiusKm: Double, callback: (List<String>) -> Unit) {
+        val cityNames = mutableListOf<String>()
+        try {
+            val addresses =
+                location?.let { geocoder.getFromLocation(it.latitude, location.longitude, 1) }
+            if (addresses != null) {
+                if (addresses.isNotEmpty()) {
+                    val currentAddress = addresses?.get(0)
+
+                    val nearbyAddresses =
+                        currentAddress?.let { geocoder.getFromLocationName(it.locality, 5) }
+                    if (nearbyAddresses != null) {
+                        for (address in nearbyAddresses) {
+                            val distance = calculateDistance(
+                                location.latitude, location.longitude,
+                                address.latitude, address.longitude
+                            )
+
+                            if (distance <= radiusKm) {
+                                cityNames.add(address.locality)
                             }
-                            .addOnFailureListener { exception ->
-                                // Handle the exception and notify the callback
-                                callback.onError("Error while retrieving location: ${exception.message}")
-                            }
-                        return null
-                    } catch (exception: Exception) {
-                        callback.onError("Error while retrieving location: ${exception.message}")
-                        return null
+                        }
                     }
-                } else {
-                    callback.onError("Location services are not enabled.")
-                    LocationUtils.requestLocationSettings(context)
-                    return null
                 }
             }
-            callback.onError("Location permission not granted.")
-            return null
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
 
-
-        override fun onPostExecute(result: Location?) {
-            callback.onLocationResult(result)
-        }
+        callback(cityNames)
     }
 
-    fun getLastLocation(callback: LocationCallback) {
-        val locationAsyncTask = LocationAsyncTask(callback)
-        locationAsyncTask.execute()
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val R = 6371 // Radius of the Earth in kilometers
+        val latDistance = Math.toRadians(lat2 - lat1)
+        val lonDistance = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
+                (Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2))
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return (R * c).toDouble()
     }
-
 }
-
-
