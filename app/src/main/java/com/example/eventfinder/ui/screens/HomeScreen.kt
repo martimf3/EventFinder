@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -17,8 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.eventfinder.MyApplication
-import com.example.eventfinder.location.LocationService
 
 
 @Composable
@@ -59,7 +55,26 @@ fun HomeScreen(
                 }
 
                 Button(onClick = {
-
+                    /*locationService.getLastLocation(object : LocationService.LocationCallback {
+                        override fun onLocationResult(location: Location?) {
+                            if (location != null) {
+                                // Handle the retrieved location her
+                                GetEvents(location, 100) { eventData ->
+                                    if (eventData != null) {
+                                        print(eventData.count())
+                                    } else {
+                                        // Handle the case where event data retrieval fails
+                                        println("Error retrieving events list")
+                                    }
+                                }
+                            } else {
+                                println("Localização não disponivel")
+                            }
+                        }
+                        override fun onError(errorMessage: String) {
+                            println("Erro ao ir buscar a localização atual")
+                        }
+                    })*/
                 }) {
                     Text(text = "Search Events")
                 }
@@ -76,8 +91,25 @@ fun HomeScreen(
                     Text(text = "Wallet")
                 }
             }
-        }
-    }
-}
 
+            Button(onClick = { navController.navigate("location") }) {
+                Text(text = "Location ")
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "WishList")
+
+            }
+
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "Wallet")
+
+            }
+
+
+        }
+
+    }
+
+}
 
