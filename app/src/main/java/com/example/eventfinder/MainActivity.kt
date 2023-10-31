@@ -8,19 +8,26 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -36,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,6 +61,9 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.ui.screens.EventListScreen
+import com.example.eventfinder.ui.screens.SignUpScreen
+import com.example.eventfinder.ui.theme.BlueLitgh
+import com.example.eventfinder.ui.theme.WhiteLigth
 
 data class BottomNavigationItem(
     val title: String,
@@ -109,11 +120,18 @@ class MainActivity : ComponentActivity() {
                     badgeCount = 3,
                 ),
                 BottomNavigationItem(
-                    title = "Settings",
+                    title = "Events",
                     route = "Profile",
-                    selectedIcon = Icons.Filled.Settings,
-                    unselectedIcon = Icons.Outlined.Settings,
-                    hasNews = true,
+                    selectedIcon = Icons.Filled.DateRange,
+                    unselectedIcon = Icons.Outlined.DateRange,
+                    hasNews = false,
+                ),
+                BottomNavigationItem(
+                    title = "Profile",
+                    route = "Profile",
+                    selectedIcon = Icons.Filled.Person,
+                    unselectedIcon = Icons.Outlined.Person,
+                    hasNews = false,
                 ),
 
 
@@ -125,7 +143,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
 
-                        NavigationBar() {
+                        NavigationBar(
+                            containerColor =  WhiteLigth,
+                            contentColor = BlueLitgh,
+
+
+                        ) {
                             items.forEachIndexed { index, item ->
                                 NavigationBarItem(
                                     selected = selectedItemIndex == index,
@@ -290,7 +313,7 @@ class MainActivity : ComponentActivity() {
                 // Sing Up With Email
                 composable("sign_up")
                 {
-
+                    SignUpScreen(navController)
                 }
 
             }
