@@ -41,7 +41,7 @@ import com.example.eventfinder.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestDesign() {
+fun TestDesignSignIn() {
     var mail by remember { mutableStateOf(TextFieldValue(""))
     }
     var password by remember { mutableStateOf("")
@@ -120,7 +120,9 @@ fun TestDesign() {
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
                     placeholderColor = Color.Gray,
-                    focusedIndicatorColor = GreenLigth
+                    containerColor = Color.Transparent,
+                    focusedIndicatorColor = GreenLigth,
+
                 )
                 )
             Spacer(modifier = Modifier.height(40.dp))
@@ -131,6 +133,7 @@ fun TestDesign() {
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
                     placeholderColor = Color.Gray,
+                    containerColor = Color.Transparent,
                     focusedIndicatorColor = GreenLigth
                 )
             )
@@ -271,7 +274,7 @@ fun TestDesign() {
 
 @Preview
 @Composable
-fun TestDesignPreview() {
-    TestDesign()
+fun TestDesignPreviewSignIn() {
+    TestDesignSignIn()
 }
 
