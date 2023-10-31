@@ -12,7 +12,7 @@ val Pink40 = Color(0xFF3F51B5)
 
 //New Color Palettes
 
-val WhiteLigth = Color(0xFFFFFFFF)
+val WhiteLigth = Color(0xFFF0EFEE)
 val GreenLigth= Color(0xFF0BD8D2)
 val BlueLitgh= Color(0xFF03A9F4)
 
