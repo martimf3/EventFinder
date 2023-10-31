@@ -39,25 +39,9 @@ fun HomeScreen(
 
         FloatingActionButton(
             modifier = Modifier
-                .size(40.dp, 40.dp)
-                .scale(0.8f, 0.8f)
-                .offset(x = 450.dp, y = 830.dp),
-            onClick = {
-
-            },
-            shape = CircleShape,
-            containerColor = WhiteLigth,
-            contentColor = Color.Black
-
-        ) {
-
-            Icon(Icons.Filled.DateRange, "Floating Calendar.")
-        }
-        FloatingActionButton(
-            modifier = Modifier
-                .size(40.dp, 40.dp)
+                .size(60.dp, 60.dp)
                 .scale(0.6f, 0.6f)
-                .offset(x = 600.dp, y = 1040.dp),
+                .offset(x = 570.dp, y = 1040.dp),
             onClick = {
 
             },
