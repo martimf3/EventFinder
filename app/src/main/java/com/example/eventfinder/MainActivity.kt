@@ -53,6 +53,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.ui.screens.EventListScreen
+import com.example.eventfinder.ui.screens.SignUpScreen
 
 data class BottomNavigationItem(
     val title: String,
@@ -290,7 +291,7 @@ class MainActivity : ComponentActivity() {
                 // Sing Up With Email
                 composable("sign_up")
                 {
-
+                    SignUpScreen(navController)
                 }
 
             }
