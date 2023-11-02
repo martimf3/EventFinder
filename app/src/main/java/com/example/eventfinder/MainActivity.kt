@@ -98,17 +98,10 @@ class MainActivity : ComponentActivity() {
 
             val items = listOf(
                 BottomNavigationItem(
-                    title = "Home",
+                    title = "Events",
                     route = "home",
-                    selectedIcon = Icons.Filled.Home,
-                    unselectedIcon = Icons.Outlined.Home,
-                    hasNews = false,
-                ),
-                BottomNavigationItem(
-                    title = "Location",
-                    route = "location",
-                    selectedIcon = Icons.Filled.LocationOn,
-                    unselectedIcon = Icons.Outlined.LocationOn,
+                    selectedIcon = Icons.Filled.DateRange,
+                    unselectedIcon = Icons.Outlined.DateRange,
                     hasNews = false,
                 ),
                 BottomNavigationItem(
@@ -120,13 +113,6 @@ class MainActivity : ComponentActivity() {
                     badgeCount = 3,
                 ),
                 BottomNavigationItem(
-                    title = "Events",
-                    route = "Profile",
-                    selectedIcon = Icons.Filled.DateRange,
-                    unselectedIcon = Icons.Outlined.DateRange,
-                    hasNews = false,
-                ),
-                BottomNavigationItem(
                     title = "Profile",
                     route = "Profile",
                     selectedIcon = Icons.Filled.Person,
@@ -136,9 +122,7 @@ class MainActivity : ComponentActivity() {
 
 
                 )
-
-
-
+            
             if (isLoggedIn) {
                 Scaffold(
                     bottomBar = {
