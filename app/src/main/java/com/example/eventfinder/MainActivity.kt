@@ -70,6 +70,7 @@ data class BottomNavigationItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+    val context = this
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
@@ -79,6 +80,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val context = MyApplication.applicationContext()
         super.onCreate(savedInstanceState)
+
         setContent {
 
             // VARIAVEIS
@@ -293,7 +295,7 @@ class MainActivity : ComponentActivity() {
                 }
                 // Teste Navegacao da Aplicacao
                 composable("eventSearch") {
-                    EventsSearchPage(navController)
+                    EventsSearchPage(navController, context)
                 }
 
                 composable("wishList") {

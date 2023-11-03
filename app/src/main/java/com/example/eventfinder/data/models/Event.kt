@@ -9,6 +9,14 @@ data class EmbeddedData(
     val events: List<EventData>
 )
 
+data class LinksData(
+    val self: SelfLink
+)
+
+data class SelfLink(
+    val href: String
+)
+
 data class EventData(
     val name: String,
     val type: String,
@@ -24,12 +32,4 @@ data class EventImage(
     val width: Int,
     val height: Int,
     val fallback: Boolean
-)
-
-data class LinksData(
-    val self: SelfLink
-)
-
-data class SelfLink(
-    val href: String
 )

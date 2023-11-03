@@ -50,6 +50,4 @@ class TicketmasterEventSearch(private val apiKey: String) {
             }
         })
     }
-
-
 }
