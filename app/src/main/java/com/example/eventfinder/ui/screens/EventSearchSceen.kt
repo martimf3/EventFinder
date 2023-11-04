@@ -1,5 +1,6 @@
 package com.example.eventfinder.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import androidx.compose.foundation.Image
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.eventfinder.data.api.ticketMaster.getEvents
@@ -49,10 +51,6 @@ fun EventsSearchPage(navController: NavController, context: Context) {
     var searchResults by remember { mutableStateOf<List<EventData>?>(null) }
     var key by remember { mutableStateOf(0) }
     var searching by remember { mutableStateOf(false) } // State for the search progress indicator
-
-    /*LaunchedEffect(searchViewModel.searchResults) {
-        searchResults = searchViewModel.searchResults.value ?: emptyList()
-    }*/
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Section with search elements
@@ -138,13 +136,6 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                         }
                     }
                 }
-
-                /*Spacer(modifier = Modifier.height(16.dp))
-
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically) {
-                }*/
             }
         }
 
@@ -166,8 +157,8 @@ fun EventsSearchPage(navController: NavController, context: Context) {
         ) {
             searchResults?.let { events ->
                 items(events) { event ->
-                    event.printEventData()
-                    EventCard(event = event, navController, searchResults)
+                    //event.printEventData()
+                    EventCard(context, event = event, navController, searchResults)
                 }
             }
         }
@@ -175,8 +166,10 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 }
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventCard(event: EventData, navController: NavController, searchResults: List<EventData>?) {
+fun EventCard(context: Context ,event: EventData, navController: NavController, searchResults: List<EventData>?) {
     val firstImage = event.images.firstOrNull() // Retrieve the first image if available
     var showEventDetails by remember { mutableStateOf(false) }
 
@@ -185,12 +178,6 @@ fun EventCard(event: EventData, navController: NavController, searchResults: Lis
             .fillMaxWidth()
             .padding(16.dp)
             .clickable {
-                /*// Set the selected event in the ViewModel
-                if (searchResults != null) {
-                    searchViewModel.updateSearchResults(searchResults)
-                }
-                // Save the selected event in the EventDetailsViewModel
-                eventDetailsViewModel.selectedEvent = event*/
                 // Show the EventDetailsPage
                 showEventDetails = true
             }
@@ -256,15 +243,31 @@ fun EventCard(event: EventData, navController: NavController, searchResults: Lis
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                event.venue?.address?.let {
-                    Text(
-                        text = it,
-                        fontSize = 14.sp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                event.venue?.let { venues ->
+                    if (venues.isNotEmpty()) {
+                        val venueInfo = buildString {
+                            appendLine("Venue Information:")
+                            venues.forEach { venue ->
+                                appendLine("Address: ${venue.address?.line1 ?: "N/A"}, City: ${venue.city?.name ?: "N/A"}, Country: ${venue.country?.name ?: "N/A"}")
+                            }
+                        }
+                        Text(
+                            text = venueInfo,
+                            fontSize = 16.sp, // Larger font size
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "No venue information available",
+                            fontSize = 16.sp, // Larger font size
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
+
                 if (showEventDetails) {
                     AlertDialog(
+                        properties = DialogProperties(usePlatformDefaultWidth = false), // Ensure a custom width
                         onDismissRequest = { showEventDetails = false },
                         title = { Text(text = "Event Details") },
                         confirmButton = {
@@ -273,9 +276,12 @@ fun EventCard(event: EventData, navController: NavController, searchResults: Lis
                             }
                         },
                         text = {
-                            EventDetailsPage(navController, event) {
-                                // Callback to dismiss the EventDetailsPage
-                                showEventDetails = false
+                            Box(
+                                modifier = Modifier.fillMaxWidth() // Take full width of the dialog
+                            ) {
+                                EventDetailsPage(context, event) {
+                                    showEventDetails = false
+                                }
                             }
                         }
                     )
@@ -289,22 +295,24 @@ suspend fun performSearch(radius: Double, useDeviceLocation: Boolean, context: C
     return suspendCoroutine { continuation ->
         var loc = Location("empty")
         val locationService = LocationService(context)
+
         if (useDeviceLocation){
             locationService.getLastLocation(context) { location ->
                 if (location != null) {
+                    //println("lat: ${location.latitude}, long: ${location.longitude}")
                     loc = location
+                    getEvents(loc, radius.toInt()) { eventList ->
+                        // Handle the list of events here
+                        if (eventList != null) {
+                            continuation.resume(eventList)
+                        } else {
+                            continuation.resume(emptyList())
+                        }
+                    }
                 }
             }
         }else{
             //loc = selectedLocation  TODO
-        }
-        getEvents(loc, radius.toInt()) { eventList ->
-            // Handle the list of events here
-            if (eventList != null) {
-                continuation.resume(eventList)
-            } else {
-                continuation.resume(emptyList())
-            }
         }
     }
 }

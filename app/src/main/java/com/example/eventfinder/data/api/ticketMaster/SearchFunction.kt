@@ -7,7 +7,9 @@ fun getEvents(location : Location, radius: Int, callback: (List<EventData>?) -> 
     val apiKey = "AQ7VrBIVkBcZzZDfGo2KiYjsVMib6pRi"
     val eventSearch = TicketmasterEventSearch(apiKey)
     val latitude = location.latitude
+    println(latitude)
     val longitude = location.longitude
+    println(longitude)
     val eventList: MutableList<EventData> = mutableListOf()
 
     eventSearch.searchEvents(latitude, longitude, radius) { eventData ->

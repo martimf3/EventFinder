@@ -30,11 +30,11 @@ class TicketmasterEventSearch(private val apiKey: String) {
         val geoPoint = "$latitude,$longitude"
 
         val call = apiService.searchEvents(apiKey, geoPoint, radius)
-
         call.enqueue(object : retrofit2.Callback<EventResponse> {
             override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
                 if (response.isSuccessful) {
                     val eventResponse = response.body()
+                    println("Response data: $eventResponse")
                     val eventData = eventResponse?._embedded?.events?.map { event ->
                         EventData(
                             event.id,
@@ -42,7 +42,7 @@ class TicketmasterEventSearch(private val apiKey: String) {
                             event.type,
                             event.url,
                             event.dates,
-                            event.pricerange,
+                            event.classifications,
                             event.attractions,
                             event.venue,
                             event.info,
