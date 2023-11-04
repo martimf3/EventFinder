@@ -220,7 +220,7 @@ fun SignUpScreen(
         // Sign in Method With Google
         Button( modifier = Modifier
             .offset(x =170.dp, y = 730.dp),
-            onClick = { /*TODO*/ },
+            onClick = { },
             colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
             Column {

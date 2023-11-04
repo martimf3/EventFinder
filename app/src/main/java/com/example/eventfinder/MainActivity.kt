@@ -53,6 +53,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
+import com.example.eventfinder.auth.googleauth.sign_in.UserData
 import com.example.eventfinder.navigation.MainNavigation
 import com.example.eventfinder.ui.screens.HomeScreen
 import com.example.eventfinder.ui.screens.ProfileScreen
@@ -62,8 +63,10 @@ import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.ui.screens.EventListScreen
 import com.example.eventfinder.ui.screens.SignUpScreen
+import com.example.eventfinder.ui.screens.UpdateProfile
 import com.example.eventfinder.ui.theme.BlueLitgh
 import com.example.eventfinder.ui.theme.WhiteLigth
+import com.google.firebase.firestore.FirebaseFirestore
 
 data class BottomNavigationItem(
     val title: String,
@@ -122,7 +125,7 @@ class MainActivity : ComponentActivity() {
 
 
                 )
-            
+
             if (isLoggedIn) {
                 Scaffold(
                     bottomBar = {
@@ -257,33 +260,54 @@ class MainActivity : ComponentActivity() {
                 composable("profile") {
                     val viewModel = viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
+                    val db = FirebaseFirestore.getInstance()
 
-                    ProfileScreen(
-                        navController,
-                        userData = googleAuthUiClient.getSignedInUser(),
-                        onSignOut = {
-                            lifecycleScope.launch {
-                                Log.d("app", "Click")
-                                googleAuthUiClient.signOut()
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Signed Out",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                if(!state.isSignInSuccessful){
-                                    isLoggedIn = false
+                    googleAuthUiClient.getSignedInUser()?.let { it1 ->
+                        ProfileScreen(
+                            navController,
+                            userData = it1,
+                            db,
+                            onSignOut = {
+                                lifecycleScope.launch {
+                                    googleAuthUiClient.signOut()
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Signed Out",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    if(!state.isSignInSuccessful){
+                                        isLoggedIn = false
+                                    }
+                                    navController.navigate("sign_in")
+
                                 }
-                                navController.navigate("sign_in")
 
                             }
-
-                        }
-                    )
+                        )
+                    }
                 }
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home") {
                     HomeScreen(navController)
 
+                }
+                //Update Profile
+                composable("update"){
+                    val db = FirebaseFirestore.getInstance()
+                    val userData = googleAuthUiClient.getSignedInUser()
+
+                    val onProfileUpdated: (Boolean) -> Unit = { result->
+                        if (result){
+                            Toast.makeText(applicationContext, "Perfil Successfuly Updated", Toast.LENGTH_LONG).show()
+                        }else{
+                            Toast.makeText(applicationContext,"Error Updating Profile", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+
+                    if (userData != null) {
+                        UpdateProfile(navController, db, userData , onProfileUpdated  )
+                    }
                 }
                 // Teste Navegacao da Aplicacao
                 composable("location") {

@@ -10,6 +10,10 @@ data class UserData(
     val username: String?,
     val profilePictureUrl: String?,
     val userEmail: String?,
-    val userPhoneNumber: String?
+    val userPhoneNumber: String?,
 
-)
+
+){
+    constructor() : this("", "", "", "", "")
+}
+

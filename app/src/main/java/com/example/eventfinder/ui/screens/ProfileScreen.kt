@@ -11,6 +11,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,20 +28,106 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.eventfinder.*
+import com.example.eventfinder.auth.googleauth.sign_in.UserData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ProfileScreen(
     navController:NavController,
-    userData: com.example.eventfinder.auth.googleauth.sign_in.UserData?,
+    userData: UserData,
+    db: FirebaseFirestore,
     onSignOut: () -> Unit
 ) {
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUser = firebaseAuth.currentUser
+    val userID = currentUser?.uid.toString()
+
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    
+    LaunchedEffect(Unit){
+        val userDoc = db.collection("users").document(userID).get().await()
+        userData = userDoc.toObject(UserData::class.java)
+    }
+
+    userData?.let {user ->
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Your HomeScreen content
+
+            user.profilePictureUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+
+                )
+
+            }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        user.username?.let { username->
+            Text(
+                text = username,
+                textAlign = TextAlign.Center,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        user.userEmail?.let { email->
+            Text(
+                text = email,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+
+                )
+
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        user.userPhoneNumber?.let {phone ->
+            Text(
+                text = phone,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp
+            )
+
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { onSignOut() }) {
+            Text(text = "Sign Out")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate("update") }) {
+            Text(text = "Update")
+
+        }
+
+        }
+    }
+}
+
+/*
+
+// Your HomeScreen content
         if(userData?.profilePictureUrl !=null){
             AsyncImage(
                 model = userData.profilePictureUrl ,
@@ -81,19 +172,4 @@ fun ProfileScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { onSignOut()}) {
-            Text(text = "Sign Out")
-
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { navController.navigate("home")}) {
-            Text(text = "Home")
-
-        }
-
-
-    }
-}
+*/
