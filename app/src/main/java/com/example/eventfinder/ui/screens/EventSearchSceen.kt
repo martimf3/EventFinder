@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,6 +50,9 @@ fun EventsSearchPage(navController: NavController, context: Context) {
     var key by remember { mutableStateOf(0) }
     var searching by remember { mutableStateOf(false) } // State for the search progress indicator
 
+    /*LaunchedEffect(searchViewModel.searchResults) {
+        searchResults = searchViewModel.searchResults.value ?: emptyList()
+    }*/
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Section with search elements
@@ -130,6 +134,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                             val results = performSearch(radius, useDeviceLocation, context)
                             searchResults = results
                             searching = false
+                            //searchViewModel.updateSearchResults(searchResults!!)
                         }
                     }
                 }
@@ -161,7 +166,8 @@ fun EventsSearchPage(navController: NavController, context: Context) {
         ) {
             searchResults?.let { events ->
                 items(events) { event ->
-                    EventCard(event = event)
+                    event.printEventData()
+                    EventCard(event = event, navController, searchResults)
                 }
             }
         }
@@ -170,13 +176,24 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 
 
 @Composable
-fun EventCard(event: EventData) {
+fun EventCard(event: EventData, navController: NavController, searchResults: List<EventData>?) {
     val firstImage = event.images.firstOrNull() // Retrieve the first image if available
+    var showEventDetails by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { /* Define navigation action navController.navigate("DestinationScreen") */}
+            .clickable {
+                /*// Set the selected event in the ViewModel
+                if (searchResults != null) {
+                    searchViewModel.updateSearchResults(searchResults)
+                }
+                // Save the selected event in the EventDetailsViewModel
+                eventDetailsViewModel.selectedEvent = event*/
+                // Show the EventDetailsPage
+                showEventDetails = true
+            }
             .height(150.dp), // Height can be adjusted as needed
         elevation =CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -239,11 +256,30 @@ fun EventCard(event: EventData) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = event.url,
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                event.venue?.address?.let {
+                    Text(
+                        text = it,
+                        fontSize = 14.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                if (showEventDetails) {
+                    AlertDialog(
+                        onDismissRequest = { showEventDetails = false },
+                        title = { Text(text = "Event Details") },
+                        confirmButton = {
+                            Button(onClick = { showEventDetails = false }) {
+                                Text(text = "Close")
+                            }
+                        },
+                        text = {
+                            EventDetailsPage(navController, event) {
+                                // Callback to dismiss the EventDetailsPage
+                                showEventDetails = false
+                            }
+                        }
+                    )
+                }
             }
         }
     }

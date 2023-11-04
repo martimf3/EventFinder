@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -48,6 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
 import com.example.eventfinder.data.api.ticketMaster.*
+import com.example.eventfinder.data.models.EventDetailsViewModel
 import com.example.eventfinder.ui.screens.EventsSearchPage
 import com.example.eventfinder.ui.screens.HomeScreen
 import com.example.eventfinder.ui.screens.ProfileScreen
@@ -79,6 +81,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         val context = MyApplication.applicationContext()
+
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -293,10 +296,23 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(navController)
 
                 }
+
+                val eventDetailsViewModel: EventDetailsViewModel by viewModels()
+
                 // Teste Navegacao da Aplicacao
                 composable("eventSearch") {
+                    //val searchViewModel = viewModel<SearchViewModel>()
+                    val eventDetailsViewModel = viewModel<EventDetailsViewModel>() // Retrieve the existing instance
                     EventsSearchPage(navController, context)
                 }
+
+                /*composable("eventDetails") { backStackEntry ->
+                    val eventDetailsViewModel = viewModel<EventDetailsViewModel>()
+                    val searchViewModel = viewModel<SearchViewModel>()
+                    EventDetailsPage(navController, searchViewModel, eventDetailsViewModel) {
+                        navController.navigateUp()
+                    }
+                }*/
 
                 composable("wishList") {
 
