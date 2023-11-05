@@ -1,6 +1,5 @@
 package com.example.eventfinder.ui.screens
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import androidx.compose.foundation.Image
@@ -19,7 +18,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -44,9 +42,7 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsSearchPage(navController: NavController, context: Context) {
-    var selectedEventType by remember { mutableStateOf("All") }
-    //var selectedLocation : String = ""
-    var radius by remember { mutableStateOf(10.0) }
+    var radius by remember { mutableStateOf(50.0) }
     var useDeviceLocation by remember { mutableStateOf(true) }
     var searchResults by remember { mutableStateOf<List<EventData>?>(null) }
     var key by remember { mutableStateOf(0) }
@@ -77,18 +73,8 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Dropdown list for event types
-                    OutlinedTextField(
-                        value = selectedEventType,
-                        onValueChange = { selectedEventType = it },
-                        label = { Text("Event Type") },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
                     // Slider for search radius
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         Text("Search Radius: ${radius.toInt()} km")
                         Slider(
                             value = radius.toFloat(),
@@ -99,7 +85,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Slide button to choose location source
                 Row(modifier = Modifier.fillMaxWidth(),
@@ -120,19 +106,29 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 
                     Button(
                         onClick = {
+                            println("key: $key")
                             // Set a Boolean key to trigger the effect when it changes
                             key++
+                            println("key: $key")
                         }
                     ) {
+                        println("Icon")
                         Icon(Icons.Filled.Search, contentDescription = "Search")
+                        println("Icon2")
                     }
                     LaunchedEffect(key) {
+                        println("antes if")
                         if (key > 0) {
+                            println("1")
                             searching = true
+                            println("2")
                             val results = performSearch(radius, useDeviceLocation, context)
+                            println("3")
                             searchResults = results
+                            println("4")
                             searching = false
-                            //searchViewModel.updateSearchResults(searchResults!!)
+                            println("5")
+
                         }
                     }
                 }
@@ -166,11 +162,9 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 }
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventCard(context: Context ,event: EventData, navController: NavController, searchResults: List<EventData>?) {
-    val firstImage = event.images.firstOrNull() // Retrieve the first image if available
+fun EventCard(context: Context, event: EventData, navController: NavController, searchResults: List<EventData>?) {
+    val firstImage = event.images?.firstOrNull() // Retrieve the first image if available
     var showEventDetails by remember { mutableStateOf(false) }
 
     Card(
@@ -182,21 +176,22 @@ fun EventCard(context: Context ,event: EventData, navController: NavController, 
                 showEventDetails = true
             }
             .height(150.dp), // Height can be adjusted as needed
-        elevation =CardDefaults.cardElevation(
+        elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ), // Set the elevation (adjust as needed)
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = BlueLitgh
-        )) {
+        )
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .width(100.dp) // Adjust width of the image column
+                    .width(130.dp) // Adjust width of the image column
                     .fillMaxHeight()
             ) {
                 // Conditional content for the image
@@ -205,7 +200,7 @@ fun EventCard(context: Context ,event: EventData, navController: NavController, 
                         painter = rememberAsyncImagePainter(firstImage.url),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit
                     )
                 } else {
                     // Placeholder or default image if the list is empty
@@ -221,49 +216,45 @@ fun EventCard(context: Context ,event: EventData, navController: NavController, 
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Rows for text elements
                 Text(
                     text = event.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f) // Adjust the weights for text rows
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = event.type,
                     fontSize = 14.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                event.classifications.firstOrNull()?.genre?.let {
+                    Text(
+                        text = "${event.classifications.firstOrNull()!!.genre.name} ${it.name}",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
 
-                event.venue?.let { venues ->
+                event._embedded?.venues?.let { venues ->
                     if (venues.isNotEmpty()) {
                         val venueInfo = buildString {
-                            appendLine("Venue Information:")
                             venues.forEach { venue ->
-                                appendLine("Address: ${venue.address?.line1 ?: "N/A"}, City: ${venue.city?.name ?: "N/A"}, Country: ${venue.country?.name ?: "N/A"}")
+                                appendLine("${venue.address?.line1 ?: "N/A"}, ${venue.city?.name ?: "N/A"}, ${venue.country?.name ?: "N/A"}")
                             }
                         }
                         Text(
                             text = venueInfo,
-                            fontSize = 16.sp, // Larger font size
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            fontSize = 12.sp,
                         )
                     } else {
                         Text(
                             text = "No venue information available",
-                            fontSize = 16.sp, // Larger font size
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            fontSize = 12.sp,
                         )
                     }
                 }
+
+                Text(
+                    text = "${event.dates.start.localDate}, ${event.dates.start.localTime}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
 
                 if (showEventDetails) {
                     AlertDialog(

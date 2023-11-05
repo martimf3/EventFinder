@@ -1,44 +1,119 @@
 package com.example.eventfinder.data.models
-
 data class EventResponse(
-    val _embedded: EmbeddedData,
-    val _links: LinksData
+    val _embedded: Embedded?
 )
 
-data class EmbeddedData(
-    val events: List<EventData>
-)
-
-data class LinksData(
-    val self: SelfLink
-)
-
-data class SelfLink(
-    val href: String
+data class Embedded(
+    val events: List<EventData>?,
+    val venues: List<Venue>?
+    // Add other potential embedded data here
 )
 
 data class EventData(
-    val id: String,
     val name: String,
     val type: String,
+    val id: String,
+    val test: Boolean,
     val url: String,
-    val dates: EventDates,
-    val classifications: List<Classifications>,
-    val attractions: List<Attraction>?,
-    val venue: List<Venues>?,
-    val info: String?,
-    val images: List<EventImage>
-) {
-    fun printEventData(){
-        println("ID: $id, name: $name,type: $type, url: $url, dates: $dates, venue: ${venue.toString()}, info: $info, ")
-    }
-}
+    val locale: String,
+    val images: List<EventImage>?,
+    val distance: Double,
+    val units: String,
+    val sales: SalesData, // You can define a better structure according to the expected data
+    val dates: Dates,
+    val classifications: List<Classification>,
+    val promoter: Promoter,
+    val promoters: List<Promoter>,
+    val priceRanges: List<PriceRange>,
+    val _links: Links,
+    val _embedded: Embedded?
+)
 
-data class Classifications(
+data class Venue(
+    val name: String,
+    val type: String,
+    val id: String,
+    val test: Boolean,
+    val url: String,
+    val locale: String,
+    val distance: Double,
+    val units: String,
+    val postalCode: String,
+    val timezone: String,
+    val city: City,
+    val state: State,
+    val country: Country,
+    val address: Address,
+    val location: Coordinates,
+    val upcomingEvents: UpcomingEvents,
+    val _links: Links
+)
+
+data class City(
+    val name: String
+)
+
+data class State(
+    val name: String
+)
+
+data class Country(
+    val name: String,
+    val countryCode: String
+)
+
+data class Address(
+    val line1: String
+)
+
+data class Coordinates(
+    val longitude: String,
+    val latitude: String
+)
+
+data class UpcomingEvents(
+    val mfx_es: Int,
+    val _total: Int,
+    val _filtered: Int
+)
+
+data class EventImage(
+    val ratio: String,
+    val url: String,
+    val width: Int,
+    val height: Int,
+    val fallback: Boolean
+)
+
+data class Dates(
+    val start: Start,
+    val timezone: String,
+    val status: Status,
+    val spanMultipleDays: Boolean
+)
+
+data class Start(
+    val localDate: String,
+    val localTime: String,
+    val dateTime: String,
+    val dateTBD: Boolean,
+    val dateTBA: Boolean,
+    val timeTBA: Boolean,
+    val noSpecificTime: Boolean
+)
+
+data class Status(
+    val code: String
+)
+
+data class Classification(
     val primary: Boolean,
-    val segment: Segment?,
-    val genre: Genre?,
-    val subGenre: SubGenre?
+    val segment: Segment,
+    val genre: Genre,
+    val subGenre: SubGenre,
+    val type: Type,
+    val subType: SubType,
+    val family: Boolean
 )
 
 data class Segment(
@@ -56,78 +131,54 @@ data class SubGenre(
     val name: String
 )
 
-data class Attraction(
-    val name: String,
-    val type: String,
+data class Type(
     val id: String,
-    val test: Boolean,
-    val locale: String,
-    val images: List<EventImage>
-)
-
-data class EventDates(
-    val start: EventStartDate,
-    val timezone: String,
-    val status: EventStatus
-)
-
-data class EventStatus(
-    val code: String
-)
-
-data class EventStartDate(
-    val localDate: String,
-    val dateTBD: Boolean,
-    val dateTBA: Boolean,
-    val timeTBA: Boolean,
-    val noSpecificTime: Boolean
-)
-
-data class Venues(
-    val id: String,
-    val name: String,
-    val type: String,
-    val locale: String,
-    val postalCode: String,
-    val timezone: String,
-    val city: City,
-    val state: State,
-    val country: Country,
-    val address: Address,
-    val location: Location,
-    val markets: List<Market>,
-    val _links: LinksData
-)
-
-data class State(
-    val name: String,
-    val stateCode: String
-)
-
-data class Location(
-    val longitude: String,
-    val latitude: String
-)
-
-data class Market(
-    val id: String
-)
-
-data class Address(
-    val line1: String
-)
-data class City(
     val name: String
 )
-data class Country (
-    val name: String,
-    val countryCode: String
+
+data class SubType(
+    val id: String,
+    val name: String
 )
 
-data class EventImage(
-    val ratio: String,
-    val url: String,
-    val width: Int,
-    val height: Int,
-    val fallback: Boolean
+data class SalesData(
+    val public: PublicSales
+)
+
+data class PublicSales(
+    val startDateTime: String,
+    val startTBD: Boolean,
+    val startTBA: Boolean,
+    val endDateTime: String
+)
+
+data class Promoter(
+    val id: String,
+    val name: String
+)
+
+data class PriceRange(
+    val type: String,
+    val currency: String,
+    val min: Double,
+    val max: Double
+)
+
+data class Links(
+    val self: Self,
+    val attractions: List<AttractionsLink>?,
+    val venues: List<VenuesLink>?
+    // Other potential links
+)
+
+data class Self(
+    val href: String
+)
+
+data class AttractionsLink(
+    val href: String
+)
+
+data class VenuesLink(
+    val href: String
 )

@@ -34,20 +34,25 @@ class TicketmasterEventSearch(private val apiKey: String) {
             override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
                 if (response.isSuccessful) {
                     val eventResponse = response.body()
-                    println("Response data: $eventResponse")
                     val eventData = eventResponse?._embedded?.events?.map { event ->
                         EventData(
-                            event.id,
                             event.name,
                             event.type,
+                            event.id,
+                            event.test,
                             event.url,
+                            event.locale,
+                            event.images,
+                            event.distance,
+                            event.units,
+                            event.sales,
                             event.dates,
                             event.classifications,
-                            event.attractions,
-                            event.venue,
-                            event.info,
-                            event.images
-                            // Other event information as needed
+                            event.promoter,
+                            event.promoters,
+                            event.priceRanges,
+                            event._links,
+                            event._embedded
                         )
                     }
                     callback(eventData)
