@@ -47,6 +47,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
     var searchResults by remember { mutableStateOf<List<EventData>?>(null) }
     var key by remember { mutableStateOf(0) }
     var searching by remember { mutableStateOf(false) } // State for the search progress indicator
+    var showNoEventsFound by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Section with search elements
@@ -106,15 +107,11 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 
                     Button(
                         onClick = {
-                            println("key: $key")
                             // Set a Boolean key to trigger the effect when it changes
                             key++
-                            println("key: $key")
                         }
                     ) {
-                        println("Icon")
                         Icon(Icons.Filled.Search, contentDescription = "Search")
-                        println("Icon2")
                     }
                     LaunchedEffect(key) {
                         println("antes if")
@@ -128,6 +125,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                             println("4")
                             searching = false
                             println("5")
+                            showNoEventsFound = results.isEmpty()
 
                         }
                     }
@@ -151,12 +149,21 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                 .padding(bottom = 100.dp)
                 .weight(1f)
         ) {
-            searchResults?.let { events ->
-                items(events) { event ->
-                    //event.printEventData()
-                    EventCard(context, event = event, navController, searchResults)
-                }
+            items(searchResults.orEmpty()) { event ->
+                EventCard(context, event = event, navController, searchResults)
             }
+        }
+
+        if (searchResults != null && searchResults!!.isEmpty() && !searching && showNoEventsFound) {
+            Text(
+                text = "No events found in that area!",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .wrapContentSize(Alignment.Center)
+            )
         }
     }
 }
