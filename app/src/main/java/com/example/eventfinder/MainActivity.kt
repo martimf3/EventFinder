@@ -13,19 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -56,18 +50,13 @@ import com.example.eventfinder.ui.screens.SignInScreen
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
-import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.ui.screens.EventsSearchPage
-import com.example.eventfinder.ui.screens.HomeScreen
-import com.example.eventfinder.ui.screens.ProfileScreen
-import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.SignUpScreen
 import com.example.eventfinder.ui.screens.UpdateProfile
 import com.example.eventfinder.ui.theme.BlueLitgh
 import com.example.eventfinder.ui.theme.WhiteLigth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.launch
+
 
 
 data class BottomNavigationItem(
@@ -322,6 +311,8 @@ class MainActivity : ComponentActivity() {
                 // Teste Navegacao da Aplicacao
                 composable("location") {
 
+                }
+
                 // Teste Navegacao da Aplicacao
                 composable("eventSearch") {
                     EventsSearchPage(navController, context)
@@ -343,6 +334,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 
 
