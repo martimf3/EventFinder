@@ -19,6 +19,14 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,11 +56,19 @@ import com.example.eventfinder.ui.screens.SignInScreen
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
+import com.example.eventfinder.data.api.ticketMaster.*
+import com.example.eventfinder.ui.screens.EventsSearchPage
+import com.example.eventfinder.ui.screens.HomeScreen
+import com.example.eventfinder.ui.screens.ProfileScreen
+import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.SignUpScreen
 import com.example.eventfinder.ui.screens.UpdateProfile
 import com.example.eventfinder.ui.theme.BlueLitgh
 import com.example.eventfinder.ui.theme.WhiteLigth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
+
 
 data class BottomNavigationItem(
     val title: String,
@@ -65,6 +81,7 @@ data class BottomNavigationItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+    val context = this
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
@@ -73,6 +90,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         val context = MyApplication.applicationContext()
+
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -90,8 +108,15 @@ class MainActivity : ComponentActivity() {
                 BottomNavigationItem(
                     title = "Events",
                     route = "home",
-                    selectedIcon = Icons.Filled.DateRange,
-                    unselectedIcon = Icons.Outlined.DateRange,
+                    selectedIcon = Icons.Filled.Home,
+                    unselectedIcon = Icons.Outlined.Home,
+                    hasNews = false,
+                ),
+                BottomNavigationItem(
+                    title = "Events Search",
+                    route = "eventSearch",
+                    selectedIcon = Icons.Filled.Search,
+                    unselectedIcon = Icons.Outlined.Search,
                     hasNews = false,
                 ),
                 BottomNavigationItem(
@@ -109,8 +134,6 @@ class MainActivity : ComponentActivity() {
                     unselectedIcon = Icons.Outlined.Person,
                     hasNews = false,
                 ),
-
-
                 )
 
             if (isLoggedIn) {
@@ -299,6 +322,9 @@ class MainActivity : ComponentActivity() {
                 // Teste Navegacao da Aplicacao
                 composable("location") {
 
+                // Teste Navegacao da Aplicacao
+                composable("eventSearch") {
+                    EventsSearchPage(navController, context)
                 }
 
                 composable("wishList") {

@@ -8,7 +8,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 interface TicketmasterApiService {
     @GET("events.json")
     fun searchEvents(
@@ -31,25 +30,42 @@ class TicketmasterEventSearch(private val apiKey: String) {
         val geoPoint = "$latitude,$longitude"
 
         val call = apiService.searchEvents(apiKey, geoPoint, radius)
-
         call.enqueue(object : retrofit2.Callback<EventResponse> {
             override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
                 if (response.isSuccessful) {
                     val eventResponse = response.body()
-                    val eventData = eventResponse?._embedded?.events
-                    callback(eventData) // Aqui, a lista pode ser nula
+                    val eventData = eventResponse?._embedded?.events?.map { event ->
+                        EventData(
+                            event.name,
+                            event.type,
+                            event.id,
+                            event.test,
+                            event.url,
+                            event.locale,
+                            event.images,
+                            event.distance,
+                            event.units,
+                            event.sales,
+                            event.dates,
+                            event.classifications,
+                            event.promoter,
+                            event.promoters,
+                            event.priceRanges,
+                            event._links,
+                            event._embedded
+                        )
+                    }
+                    callback(eventData)
                 } else {
                     println("Request failed with status code ${response.code()}")
-                    callback(null) // Aqui, você passa null em caso de falha
+                    callback(null)
                 }
             }
 
             override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 println("Request error: $t")
-                callback(null) // Aqui, você passa null em caso de erro
+                callback(null)
             }
         })
     }
-
-
 }

@@ -119,5 +119,4 @@ class GoogleAuthUiClient (
             .setAutoSelectEnabled(true)
             .build()
     }
-
 }
