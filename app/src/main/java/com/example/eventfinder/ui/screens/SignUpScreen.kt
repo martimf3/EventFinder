@@ -85,33 +85,9 @@ fun SignUpScreen(
                 drawRoundRect(
                     color = WhiteLigth,
                     cornerRadius = CornerRadius(40f,30f),
-                    size = Size( 1200f,  1410f ),
+                    size = Size( 1200f,  1500f ),
 
                     )
-            }
-        )
-
-        Text( modifier = Modifier
-            .offset(x=140.dp, y=700.dp),
-            text = "Use other Method",
-            style = TextStyle(
-                fontFamily = FontFamily.Serif,
-                color = WhiteLigth
-            )
-        )
-
-        // Lines Between "Use Other Methods"
-        Canvas(
-            modifier = Modifier
-                .offset(x = 80.dp, y = 705.dp),
-            onDraw = {
-                drawLine(
-                    color = Color.White,
-                    start = Offset(0f,60f),
-                    end = Offset(900f,60f),
-                    strokeWidth = 2f
-
-                )
             }
         )
 
@@ -178,7 +154,8 @@ fun SignUpScreen(
 
             Button(
                 modifier = Modifier
-                    .size(250.dp,45.dp),
+                    .size(250.dp,45.dp)
+                    .offset(x=0.dp, y= 20.dp),
                 onClick = {},
                 colors = ButtonDefaults.buttonColors(GreenLigth)){
                 Text(
@@ -219,6 +196,8 @@ fun SignUpScreen(
             )
         )
 
+        /*
+
         // Sign in Method With Google
         Button( modifier = Modifier
             .offset(x =170.dp, y = 730.dp),
@@ -239,6 +218,8 @@ fun SignUpScreen(
             }
 
         }
+
+         */
 
         //Horizontal Rectangle
         Canvas(

@@ -2,6 +2,7 @@ package com.example.eventfinder.ui.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -53,6 +56,7 @@ fun ProfileScreen(
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var confirmationText by remember { mutableStateOf("") }
+    var showOptions by remember { mutableStateOf(false) }
 
     
     LaunchedEffect(Unit){
@@ -62,9 +66,11 @@ fun ProfileScreen(
 
     userData?.let {user ->
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
 
 
@@ -119,16 +125,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { onSignOut() }) {
-            Text(text = "Sign Out")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { navController.navigate("update") }) {
-            Text(text = "Update")
-
-        }
 
     }
     }
@@ -138,8 +134,6 @@ fun ProfileScreen(
                 .delete()
                 .addOnSuccessListener {
                     Log.d("ProfileDeletion", "User data deleted from Firestore")
-                    // Depois que os dados do Firestore forem excluídos com sucesso,
-                    // então proceda com a exclusão do usuário do Firebase Authentication
                     firebaseAuth.currentUser?.delete()
                     navController.navigate("sign_in")
                 }
@@ -156,7 +150,121 @@ fun ProfileScreen(
             .size(250.dp, 75.dp)
             .offset(x = 80.dp, y = 650.dp)
     )
+
+    Button(onClick = { showOptions = true }) {
+        Text(text = "Options")
+
+    }
+
+    if(showOptions){
+        AlertDialog(
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+            onDismissRequest = { showOptions = false },
+            title = { Text(text = "Options") },
+            confirmButton = { 
+                Button(onClick = { showOptions = false }) {
+                    Text(text = "Close")
+                }
+            },
+            text = {
+                // Options Inside Dialog
+                userData?.let { user ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+
+                    ) {
+                        user.profilePictureUrl?.let { url ->
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+
+                            )
+
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        user.username?.let { username ->
+                            Text(
+                                text = username,
+                                textAlign = TextAlign.Center,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(onClick = { onSignOut() }) {
+                            Text(text = "Sign Out")
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(onClick = { navController.navigate("update") }) {
+                            Text(text = "Update")
+
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(onClick = {
+                            if (confirmationText.uppercase() == keyword) {
+                                db.collection("users").document(userID)
+                                    .delete()
+                                    .addOnSuccessListener {
+                                        Log.d("ProfileDeletion", "User data deleted from Firestore")
+                                        firebaseAuth.currentUser?.delete()
+                                        navController.navigate("sign_in")
+                                    }
+                            }
+                        }) {
+                            Text(text = "Delete Profile")
+                        }
+                        OutlinedTextField(
+                            value = confirmationText,
+                            onValueChange = { confirmationText = it },
+                            label = { Text("Type '$keyword' for Profile Elimination",
+                                textAlign = TextAlign.Center) },
+                            modifier = Modifier
+                                .size(250.dp, 75.dp)
+                                .offset(x = 80.dp, y = 650.dp)
+                        )
+
+
+
+
+
+                    }
+
+                }
+
+
+            }
+        )
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 
