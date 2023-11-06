@@ -10,20 +10,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +42,10 @@ import com.example.eventfinder.data.api.ticketMaster.getEvents
 import com.example.eventfinder.data.models.EventData
 import com.example.eventfinder.location.*
 import com.example.eventfinder.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -49,13 +59,14 @@ fun EventsSearchPage(navController: NavController, context: Context) {
     var searching by remember { mutableStateOf(false) } // State for the search progress indicator
     var showNoEventsFound by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .fillMaxSize()){
         // Top Section with search elements
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp) // Adjusted height for additional space
-                .background(Color.LightGray)
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -82,6 +93,13 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                             onValueChange = { radius = it.toDouble() },
                             valueRange = 50.0f..200.0f,
                             steps = 150,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color.Black,
+                                activeTrackColor = Color.Black,
+                                inactiveTrackColor = Color.Transparent
+                            )
+
                         )
                     }
                 }
@@ -99,7 +117,13 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                             checked = useDeviceLocation,
                             onCheckedChange = {
                                 useDeviceLocation = it
-                            }
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color.Green.copy(alpha = 0.5f),
+                                uncheckedThumbColor = Color.Black,
+                                uncheckedTrackColor = Color.Red.copy(alpha = 0.3f),
+                            )
                         )
                     }
 
@@ -109,9 +133,14 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                         onClick = {
                             // Set a Boolean key to trigger the effect when it changes
                             key++
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(Color.Black.copy(alpha = 0.8f))
                     ) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                        Icon(imageVector = Icons.Filled.Search,
+                            contentDescription = "Search",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .scale(1.3f,1.3f),)
                     }
                     LaunchedEffect(key) {
                         println("antes if")
@@ -136,6 +165,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
         // Adding a progress indicator when searching is in progress
         if (searching) {
             CircularProgressIndicator(
+                color = Color.Black,
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.CenterHorizontally)
@@ -210,25 +240,26 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                         contentScale = ContentScale.Fit
                     )
                 } else {
-                    // Placeholder or default image if the list is empty
-                    // You can replace this with a default image or another placeholder
-                    // Image, remember to provide a placeholder content
-                    // or suitable fallback image
-                    // Example: Image(...)
+                   
                 }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+
             ) {
+                //Button Card
+
                 Text(
                     text = event.name,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth()
                 )
+
 
                 event.classifications?.firstOrNull()?.genre?.let {
                     Text(
@@ -257,11 +288,37 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                     }
                 }
 
-                Text(
-                    text = "${event.dates?.start?.localDate}, ${event.dates?.start?.localTime}",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Row {
+                    Text(
+                        text = "${event.dates?.start?.localDate}, ${event.dates?.start?.localTime}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    IconButton(onClick = {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        val eventId = event.id
+
+
+                        if (currentUser != null){
+                            val userId = currentUser.uid
+                            val userDoc = Firebase.firestore.collection("users").document(userId)
+                            userDoc.update("wishlist", FieldValue.arrayUnion(eventId))
+
+                        }
+
+                    },
+                        modifier = Modifier
+                            .scale(1.5f, 1.5f)
+                            .offset(x = 30.dp, y = 0.dp),) {
+                        Icon(imageVector = Icons.Filled.Favorite,
+                            contentDescription = "",
+                            tint = WhiteLigth.copy(alpha = 0.4f))
+
+                    }
+
+                }
+
 
                 if (showEventDetails) {
                     AlertDialog(
@@ -284,6 +341,8 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                         }
                     )
                 }
+
+
             }
         }
     }
