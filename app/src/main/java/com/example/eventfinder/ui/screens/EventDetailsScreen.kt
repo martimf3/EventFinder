@@ -58,7 +58,7 @@ fun EventDetailsPage(context: Context, event: EventData, onBack: () -> Unit) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                val classification = event.classifications.firstOrNull()
+                val classification = event.classifications?.firstOrNull()
                 val classificationText = classification?.let {
                     "${it.segment?.name ?: "N/A"}, ${it.genre?.name ?: "N/A"}"
                 } ?: "No available information"
@@ -82,9 +82,9 @@ fun EventDetailsPage(context: Context, event: EventData, onBack: () -> Unit) {
                     )
                 }
 
-                val minPrice = event.priceRanges.minByOrNull { it.min }?.min ?: 0.0
-                val maxPrice = event.priceRanges.maxByOrNull { it.max }?.max ?: 0.0
-                val currency = event.priceRanges.firstOrNull()?.currency ?: "N/A"
+                val minPrice = event.priceRanges?.minByOrNull { it.min }?.min ?: 0.0
+                val maxPrice = event.priceRanges?.maxByOrNull { it.max }?.max ?: 0.0
+                val currency = event.priceRanges?.firstOrNull()?.currency ?: "N/A"
 
                 Text(
                     text = "Price Range: $minPrice - $maxPrice $currency",
@@ -95,13 +95,13 @@ fun EventDetailsPage(context: Context, event: EventData, onBack: () -> Unit) {
                 //val formattedDateTime = formatDateTime(event.sales.public.endDateTime)
 
                 Text(
-                    text = "Ticket Sales End in: ${event.sales.public.endDateTime}",
+                    text = "Ticket Sales End in: ${event.sales?.public?.endDateTime}",
                     fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
                 Text(
-                    text = "Promotores: ${event.promoter.name}",
+                    text = "Promotores: ${event.promoter?.name}",
                     fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
