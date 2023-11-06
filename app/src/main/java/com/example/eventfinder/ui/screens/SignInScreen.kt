@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -263,6 +265,32 @@ fun SignInScreen(
                 )
             }
         )
+
+        //Floating Button
+
+        FloatingActionButton(
+            onClick = { navController.navigate("sign_up")},
+            modifier = Modifier
+                .offset(x=365.dp, y = 755.dp)
+                .size(60.dp, 60.dp),
+            shape = CircleShape,
+            containerColor = GreenLigth
+
+        ) {
+            Image(
+                modifier = Modifier
+                    .offset(x = 0.dp, y = 0.dp)
+                    .size(60.dp, 60.dp),
+                painter = painterResource(id = R.mipmap.plus_icon) ,
+                contentDescription = "SignUp Page Button",
+                alignment = Alignment.CenterStart
+            )
+
+        }
+
+
+
+        /*
         //Redirect Button for SignUp
         Button( modifier = Modifier
             .offset(x =345.dp, y = 750.dp),
@@ -279,6 +307,9 @@ fun SignInScreen(
             )
 
         }
+         */
+
+
         //Logo Image
         Image(
             modifier = Modifier
