@@ -52,7 +52,7 @@ fun ProfileScreen(
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUser = firebaseAuth.currentUser
     val userID = currentUser?.uid.toString()
-    val keyword = "DELETE"
+    val keyword = currentUser?.displayName.toString()
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var confirmationText by remember { mutableStateOf("") }
@@ -141,15 +141,6 @@ fun ProfileScreen(
     }) {
         Text(text = "Delete Profile")
     }
-    OutlinedTextField(
-        value = confirmationText,
-        onValueChange = { confirmationText = it },
-        label = { Text("Type '$keyword' for Profile Elimination",
-            textAlign = TextAlign.Center) },
-        modifier = Modifier
-            .size(250.dp, 75.dp)
-            .offset(x = 80.dp, y = 650.dp)
-    )
 
     Button(onClick = { showOptions = true }) {
         Text(text = "Options")
@@ -215,8 +206,19 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        OutlinedTextField(
+                            value = confirmationText,
+                            onValueChange = { confirmationText = it },
+                            label = { Text("Type '$keyword' for Profile Elimination",
+                                textAlign = TextAlign.Center) },
+                            modifier = Modifier
+                                .size(350.dp,55.dp)
+
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         Button(onClick = {
-                            if (confirmationText.uppercase() == keyword) {
+                            if (confirmationText == keyword) {
                                 db.collection("users").document(userID)
                                     .delete()
                                     .addOnSuccessListener {
@@ -228,15 +230,7 @@ fun ProfileScreen(
                         }) {
                             Text(text = "Delete Profile")
                         }
-                        OutlinedTextField(
-                            value = confirmationText,
-                            onValueChange = { confirmationText = it },
-                            label = { Text("Type '$keyword' for Profile Elimination",
-                                textAlign = TextAlign.Center) },
-                            modifier = Modifier
-                                .size(250.dp, 75.dp)
-                                .offset(x = 80.dp, y = 650.dp)
-                        )
+
 
 
 
