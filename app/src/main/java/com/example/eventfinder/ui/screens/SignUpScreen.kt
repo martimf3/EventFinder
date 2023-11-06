@@ -149,8 +149,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
             //PhoneNumber
             TextField(value = number, onValueChange = {number = it},
-                label = { Text(text = "PhoneNumber") },
-                placeholder = { Text(text = "Enter Your Email") },
+                label = { Text(text = "Phone Number") },
+                placeholder = { Text(text = "Enter Your Phone Number") },
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
                     placeholderColor = Color.Gray,
@@ -164,7 +164,7 @@ fun SignUpScreen(
             //Password
             TextField(value = password, onValueChange = {password = it},
                 label = { Text(text = "Password") },
-                placeholder = { Text(text = "Enter Your Email") },
+                placeholder = { Text(text = "Enter Your Password") },
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
                     placeholderColor = Color.Gray,
@@ -220,7 +220,7 @@ fun SignUpScreen(
         // Sign in Method With Google
         Button( modifier = Modifier
             .offset(x =170.dp, y = 730.dp),
-            onClick = { /*TODO*/ },
+            onClick = { },
             colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
             Column {
@@ -229,7 +229,7 @@ fun SignUpScreen(
                     contentDescription = "Google Button"
                 )
                 Text(
-                    text = "Sign-In",
+                    text = "Sign-Up",
                     style = TextStyle(
                         color = Color.White
                     )

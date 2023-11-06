@@ -19,12 +19,12 @@ data class EventData(
     val images: List<EventImage>?,
     val distance: Double,
     val units: String,
-    val sales: SalesData, // You can define a better structure according to the expected data
-    val dates: Dates,
-    val classifications: List<Classification>,
-    val promoter: Promoter,
-    val promoters: List<Promoter>,
-    val priceRanges: List<PriceRange>,
+    val sales: SalesData?, // You can define a better structure according to the expected data
+    val dates: Dates?,
+    val classifications: List<Classification>?,
+    val promoter: Promoter?,
+    val promoters: List<Promoter>?,
+    val priceRanges: List<PriceRange>?,
     val _links: Links,
     val _embedded: Embedded?
 )

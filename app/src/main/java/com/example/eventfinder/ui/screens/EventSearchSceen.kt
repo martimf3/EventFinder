@@ -230,7 +230,7 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                event.classifications.firstOrNull()?.genre?.let {
+                event.classifications?.firstOrNull()?.genre?.let {
                     Text(
                         text = "${event.classifications.firstOrNull()!!.genre.name} ${it.name}",
                         fontSize = 12.sp,
@@ -258,7 +258,7 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                 }
 
                 Text(
-                    text = "${event.dates.start.localDate}, ${event.dates.start.localTime}",
+                    text = "${event.dates?.start?.localDate}, ${event.dates?.start?.localTime}",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )

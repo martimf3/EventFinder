@@ -154,7 +154,7 @@ fun SignInScreen(
             //Password
             TextField(value = password, onValueChange = {password = it},
                 label = { Text(text = "Password")},
-                placeholder = { Text(text = "Enter Your Email")},
+                placeholder = { Text(text = "Enter Your Password")},
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
                     placeholderColor = Color.Gray,

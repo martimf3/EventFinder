@@ -1,7 +1,6 @@
 package com.example.eventfinder
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,15 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -47,16 +44,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
-import com.example.eventfinder.data.api.ticketMaster.*
-import com.example.eventfinder.ui.screens.EventsSearchPage
 import com.example.eventfinder.ui.screens.HomeScreen
 import com.example.eventfinder.ui.screens.ProfileScreen
 import com.example.eventfinder.ui.screens.SignInScreen
-import com.example.eventfinder.ui.screens.SignUpScreen
-import com.example.eventfinder.ui.theme.BlueLitgh
-import com.example.eventfinder.ui.theme.WhiteLigth
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import com.example.eventfinder.data.api.ticketMaster.*
+import com.example.eventfinder.ui.screens.EventsSearchPage
+import com.example.eventfinder.ui.screens.SignUpScreen
+import com.example.eventfinder.ui.screens.UpdateProfile
+import com.example.eventfinder.ui.theme.BlueLitgh
+import com.example.eventfinder.ui.theme.WhiteLigth
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 
 data class BottomNavigationItem(
@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
 
             val items = listOf(
                 BottomNavigationItem(
-                    title = "Home",
+                    title = "Events",
                     route = "home",
                     selectedIcon = Icons.Filled.Home,
                     unselectedIcon = Icons.Outlined.Home,
@@ -115,13 +115,6 @@ class MainActivity : ComponentActivity() {
                     unselectedIcon = Icons.Outlined.FavoriteBorder,
                     hasNews = false,
                     badgeCount = 3,
-                ),
-                BottomNavigationItem(
-                    title = "Events",
-                    route = "Profile",
-                    selectedIcon = Icons.Filled.DateRange,
-                    unselectedIcon = Icons.Outlined.DateRange,
-                    hasNews = false,
                 ),
                 BottomNavigationItem(
                     title = "Profile",
@@ -266,32 +259,57 @@ class MainActivity : ComponentActivity() {
                 composable("profile") {
                     val viewModel = viewModel<SignInViewModel>()
                     val state by viewModel.state.collectAsStateWithLifecycle()
+                    val db = FirebaseFirestore.getInstance()
 
-                    ProfileScreen(
-                        navController,
-                        userData = googleAuthUiClient.getSignedInUser(),
-                        onSignOut = {
-                            lifecycleScope.launch {
-                                Log.d("app", "Click")
-                                googleAuthUiClient.signOut()
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Signed Out",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                if(!state.isSignInSuccessful){
-                                    isLoggedIn = false
+                    googleAuthUiClient.getSignedInUser()?.let { it1 ->
+                        ProfileScreen(
+                            navController,
+                            userData = it1,
+                            db,
+                            onSignOut = {
+                                lifecycleScope.launch {
+                                    googleAuthUiClient.signOut()
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Signed Out",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    if(!state.isSignInSuccessful){
+                                        isLoggedIn = false
+                                    }
+                                    navController.navigate("sign_in")
+
                                 }
-                                navController.navigate("sign_in")
 
                             }
-
-                        }
-                    )
+                        )
+                    }
                 }
                 //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
                 composable("home") {
                     HomeScreen(navController)
+
+                }
+                //Update Profile
+                composable("update"){
+                    val db = FirebaseFirestore.getInstance()
+                    val userData = googleAuthUiClient.getSignedInUser()
+
+                    val onProfileUpdated: (Boolean) -> Unit = { result->
+                        if (result){
+                            Toast.makeText(applicationContext, "Perfil Successfuly Updated", Toast.LENGTH_LONG).show()
+                        }else{
+                            Toast.makeText(applicationContext,"Error Updating Profile", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+
+                    if (userData != null) {
+                        UpdateProfile(navController, db, userData , onProfileUpdated  )
+                    }
+                }
+                // Teste Navegacao da Aplicacao
+                composable("location") {
 
                 }
 
@@ -311,9 +329,12 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
+
+
         }
     }
 }
+
 
 
 

@@ -37,22 +37,7 @@ fun HomeScreen(
     navController: NavController
 ) {
 
-        FloatingActionButton(
-            modifier = Modifier
-                .size(60.dp, 60.dp)
-                .scale(0.6f, 0.6f)
-                .offset(x = 570.dp, y = 1040.dp),
-            onClick = {
 
-            },
-            shape = CircleShape,
-            containerColor = WhiteLigth,
-            contentColor = Color.Black
-
-        ) {
-
-            Icon(Icons.Filled.Search, "Floating Search.")
-        }
 
     }
 
