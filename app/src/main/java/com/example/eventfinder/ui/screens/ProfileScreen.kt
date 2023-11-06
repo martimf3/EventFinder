@@ -1,14 +1,19 @@
 package com.example.eventfinder.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController:NavController,
@@ -43,8 +49,11 @@ fun ProfileScreen(
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentUser = firebaseAuth.currentUser
     val userID = currentUser?.uid.toString()
+    val keyword = "DELETE"
 
     var userData by remember { mutableStateOf<UserData?>(null) }
+    var confirmationText by remember { mutableStateOf("") }
+
     
     LaunchedEffect(Unit){
         val userDoc = db.collection("users").document(userID).get().await()
@@ -59,23 +68,23 @@ fun ProfileScreen(
     ) {
 
 
-            user.profilePictureUrl?.let { url ->
-                AsyncImage(
-                    model = url,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+        user.profilePictureUrl?.let { url ->
+            AsyncImage(
+                model = url,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
 
-                )
+            )
 
-            }
+        }
 
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        user.username?.let { username->
+        user.username?.let { username ->
             Text(
                 text = username,
                 textAlign = TextAlign.Center,
@@ -87,7 +96,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        user.userEmail?.let { email->
+        user.userEmail?.let { email ->
             Text(
                 text = email,
                 textAlign = TextAlign.Center,
@@ -99,7 +108,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        user.userPhoneNumber?.let {phone ->
+        user.userPhoneNumber?.let { phone ->
             Text(
                 text = phone,
                 textAlign = TextAlign.Center,
@@ -121,8 +130,32 @@ fun ProfileScreen(
 
         }
 
-        }
     }
+    }
+    Button(onClick = {
+        if (confirmationText.uppercase() == keyword) {
+            db.collection("users").document(userID)
+                .delete()
+                .addOnSuccessListener {
+                    Log.d("ProfileDeletion", "User data deleted from Firestore")
+                    // Depois que os dados do Firestore forem excluídos com sucesso,
+                    // então proceda com a exclusão do usuário do Firebase Authentication
+                    firebaseAuth.currentUser?.delete()
+                    navController.navigate("sign_in")
+                }
+        }
+    }) {
+        Text(text = "Delete Profile")
+    }
+    OutlinedTextField(
+        value = confirmationText,
+        onValueChange = { confirmationText = it },
+        label = { Text("Type '$keyword' for Profile Elimination",
+            textAlign = TextAlign.Center) },
+        modifier = Modifier
+            .size(250.dp, 75.dp)
+            .offset(x = 80.dp, y = 650.dp)
+    )
 }
 
 /*
