@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -182,7 +183,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                 .weight(1f)
         ) {
             items(searchResults.orEmpty()) { event ->
-                EventCard(context, event = event, navController, searchResults)
+                EventCard(context, event = event, navController, searchResults, false)
             }
         }
 
@@ -202,10 +203,12 @@ fun EventsSearchPage(navController: NavController, context: Context) {
 
 
 @Composable
-fun EventCard(context: Context, event: EventData, navController: NavController, searchResults: List<EventData>?) {
+fun EventCard(context: Context, event: EventData, navController: NavController, searchResults: List<EventData>?, isWalletList: Boolean) {
     val firstImage = event.images?.firstOrNull() // Retrieve the first image if available
     var showEventDetails by remember { mutableStateOf(false) }
-
+    var eventInWishList by remember { mutableStateOf(false) }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    val eventId = event.id
 
     Card(
         modifier = Modifier
@@ -298,92 +301,126 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                         fontWeight = FontWeight.Bold
                     )
 
+
                     IconButton(onClick = {
+                        eventInWishList = !eventInWishList
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         val eventId = event.id
                         val userId = currentUser?.uid.toString()
                         val addUserEvent = Firebase.firestore.collection("users").document(userId).collection("wishlist")
 
-                        addUserEvent.document(eventId)
-                            .set(mapOf(
-                                "name" to event.name,
-                                "type" to event.type,
-                                "id" to event.id,
-                                "test" to event.test,
-                                "url" to event.url,
-                                "locale" to event.locale,
-                                "distance" to event.distance,
-                                "units" to event.units,
-                                // Mapear as imagens do evento se houver
-                                "images" to event.images?.map { image ->
-                                    mapOf(
-                                        "ratio" to image.ratio,
-                                        "url" to image.url,
-                                        "width" to image.width,
-                                        "height" to image.height,
-                                        "fallback" to image.fallback
-                                    )
-                                },
-                                "sales" to mapOf(
-                                    "public" to mapOf(
-                                        "startDateTime" to event.sales?.public?.startDateTime,
-                                        "startTBD" to event.sales?.public?.startTBD,
-                                        "startTBA" to event.sales?.public?.startTBA,
-                                        "endDateTime" to event.sales?.public?.endDateTime
-                                    )
-                                ),
-                                "dates" to mapOf(
-                                    "start" to mapOf(
-                                        "localDate" to event.dates?.start?.localDate,
-                                        "localTime" to event.dates?.start?.localTime,
-                                        "dateTime" to event.dates?.start?.dateTime,
-                                        "dateTBD" to event.dates?.start?.dateTBD,
-                                        "dateTBA" to event.dates?.start?.dateTBA,
-                                        "timeTBA" to event.dates?.start?.timeTBA,
-                                        "noSpecificTime" to event.dates?.start?.noSpecificTime
-                                    ),
-                                    "timezone" to event.dates?.timezone,
-                                    "status" to mapOf(
-                                        "code" to event.dates?.status?.code
-                                    ),
-                                    "spanMultipleDays" to event.dates?.spanMultipleDays
-                                ),
-                                "classifications" to event.classifications?.map { classification ->
-                                    mapOf(
-                                        "primary" to classification.primary,
-                                        "segment" to mapOf(
-                                            "id" to classification.segment.id,
-                                            "name" to classification.segment.name
-                                        ),
-                                        "genre" to mapOf(
-                                            "id" to classification.genre.id,
-                                            "name" to classification.genre.name
-                                        ),
-                                        "subGenre" to mapOf(
-                                            "id" to classification.subGenre.id,
-                                            "name" to classification.subGenre.name
-                                        ),
-                                        "type" to mapOf(
-                                            "id" to classification.type.id,
-                                            "name" to classification.type.name
-                                        ),
-                                        "subType" to mapOf(
-                                            "id" to classification.subType.id,
-                                            "name" to classification.subType.name
-                                        ),
-                                        "family" to classification.family
-                                    )
-                                },
+                        addUserEvent.document(eventId).get().addOnSuccessListener { documentSnapshot ->
+                            if(documentSnapshot.exists()){
+                                addUserEvent.document(eventId).delete()
+                                if (isWalletList){
+                                    navController.navigate("wishlist")
+                                }
 
-                            ))
+                            }else {
+                                addUserEvent.document(eventId)
+                                    .set(
+                                        mapOf(
+                                            "name" to event.name,
+                                            "type" to event.type,
+                                            "id" to event.id,
+                                            "test" to event.test,
+                                            "url" to event.url,
+                                            "locale" to event.locale,
+                                            "distance" to event.distance,
+                                            "units" to event.units,
+                                            // Mapear as imagens do evento se houver
+                                            "images" to event.images?.map { image ->
+                                                mapOf(
+                                                    "ratio" to image.ratio,
+                                                    "url" to image.url,
+                                                    "width" to image.width,
+                                                    "height" to image.height,
+                                                    "fallback" to image.fallback
+                                                )
+                                            },
+                                            "sales" to mapOf(
+                                                "public" to mapOf(
+                                                    "startDateTime" to event.sales?.public?.startDateTime,
+                                                    "startTBD" to event.sales?.public?.startTBD,
+                                                    "startTBA" to event.sales?.public?.startTBA,
+                                                    "endDateTime" to event.sales?.public?.endDateTime
+                                                )
+                                            ),
+                                            "dates" to mapOf(
+                                                "start" to mapOf(
+                                                    "localDate" to event.dates?.start?.localDate,
+                                                    "localTime" to event.dates?.start?.localTime,
+                                                    "dateTime" to event.dates?.start?.dateTime,
+                                                    "dateTBD" to event.dates?.start?.dateTBD,
+                                                    "dateTBA" to event.dates?.start?.dateTBA,
+                                                    "timeTBA" to event.dates?.start?.timeTBA,
+                                                    "noSpecificTime" to event.dates?.start?.noSpecificTime
+                                                ),
+                                                "timezone" to event.dates?.timezone,
+                                                "status" to mapOf(
+                                                    "code" to event.dates?.status?.code
+                                                ),
+                                                "spanMultipleDays" to event.dates?.spanMultipleDays
+                                            ),
+                                            "classifications" to event.classifications?.map { classification ->
+                                                mapOf(
+                                                    "primary" to classification.primary,
+                                                    "segment" to mapOf(
+                                                        "id" to classification.segment.id,
+                                                        "name" to classification.segment.name
+                                                    ),
+                                                    "genre" to mapOf(
+                                                        "id" to classification.genre.id,
+                                                        "name" to classification.genre.name
+                                                    ),
+                                                    "subGenre" to mapOf(
+                                                        "id" to classification.subGenre.id,
+                                                        "name" to classification.subGenre.name
+                                                    ),
+                                                    "type" to mapOf(
+                                                        "id" to classification.type.id,
+                                                        "name" to classification.type.name
+                                                    ),
+                                                    "subType" to mapOf(
+                                                        "id" to classification.subType.id,
+                                                        "name" to classification.subType.name
+                                                    ),
+                                                    "family" to classification.family
+                                                )
+                                            },
+
+                                            )
+                                    )
+                            }
+                        }
+
 
                     },
                         modifier = Modifier
                             .scale(1.5f, 1.5f)
-                            .offset(x = 30.dp, y = 0.dp),) {
-                        Icon(imageVector = Icons.Filled.Favorite,
+                            .offset(x = 30.dp, y = 0.dp),)
+                    {
+
+
+
+                        if (userId != null){
+                            val docRef = Firebase.firestore.collection("users").document(userId).collection("wishlist").document(eventId)
+                            docRef.get()
+                                .addOnSuccessListener { documentSnapshot ->
+                                    eventInWishList = documentSnapshot.exists()
+                                }
+                        }
+                           val icon = if(eventInWishList){
+                               Icons.Filled.Delete
+
+                            }else{
+                               Icons.Filled.Favorite
+                            }
+
+                        Icon(imageVector = icon,
                             contentDescription = "",
                             tint = WhiteLigth.copy(alpha = 0.4f))
+
 
                     }
 

@@ -4,7 +4,7 @@ import com.example.eventfinder.data.models.EventData
 
 
 fun getEvents(location : Location, radius: Int, callback: (List<EventData>?) -> Unit)  {
-    val apiKey = "*********"
+    val apiKey = "AQ7VrBIVkBcZzZDfGo2KiYjsVMib6pRi"
     val eventSearch = TicketmasterEventSearch(apiKey)
     val latitude = location.latitude
     println(latitude)

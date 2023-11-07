@@ -35,7 +35,9 @@ fun EventWalletPage(
     events: List<EventData>
 ) {
     var selectedEventType by remember { mutableStateOf<String?>(null) }
-    var filteredEvents by remember { mutableStateOf<List<EventData>?>(events) }
+    var favoriteEvents by remember { mutableStateOf<List<EventData>>(events) }
+    var filteredEvents by remember { mutableStateOf<List<EventData>?>(favoriteEvents) }
+    filteredEvents = events
 
     // Extract event types from the list of events
     val eventTypes = events.map { it.classifications?.firstOrNull()?.segment?.name }.distinct()
@@ -45,7 +47,7 @@ fun EventWalletPage(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp) // Adjusted height for additional space
+                .height(150.dp) // Adjusted height for additional space
                 .background(Color.LightGray)
         ) {
             Column(
@@ -53,7 +55,7 @@ fun EventWalletPage(
             ) {
                 // Title for search section
                 Text(
-                    text = "Filter Events by Type",
+                    text = "Filter Events by Type:",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -68,28 +70,24 @@ fun EventWalletPage(
                             selectedEventType = selectedEventType?.let { null }
                         }
                 ) {
-                    Text(
-                        text = selectedEventType ?: "Select Event Type",
-                        modifier = Modifier.padding(8.dp)
-                    )
-
-                    if (selectedEventType != null) {
-                        DropdownMenu(
-                            expanded = true,
-                            onDismissRequest = { selectedEventType = null }
-                        ) {
-                            eventTypes.forEach { eventType ->
-                                DropdownMenuItem(
-                                    { Text(text = eventType ?: "All Events") },
-                                    onClick = {
-                                        selectedEventType = eventType
-                                        filteredEvents = events.filter {
+                    println("HERE ${eventTypes.count()}")
+                    eventTypes.forEach { eventType ->
+                        Text(
+                            text = eventType ?: "All Events",
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .background(if (eventType == selectedEventType) Color.Gray else Color.LightGray)
+                                .clickable {
+                                    selectedEventType = if (eventType == selectedEventType) null else eventType
+                                    filteredEvents = if (selectedEventType != null) {
+                                        events.filter {
                                             it.classifications?.firstOrNull()?.segment?.name == selectedEventType
                                         }
+                                    } else {
+                                        events
                                     }
-                                )
-                            }
-                        }
+                                }
+                        )
                     }
                 }
             }
@@ -103,7 +101,7 @@ fun EventWalletPage(
                 .weight(1f)
         ) {
             items(filteredEvents ?: events) { event ->
-                EventCard(context, event, navController, events)
+                EventCard(context, event, navController, events, true)
             }
         }
     }
