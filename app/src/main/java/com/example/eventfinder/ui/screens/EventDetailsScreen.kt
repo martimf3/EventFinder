@@ -3,6 +3,7 @@ package com.example.eventfinder.ui.screens
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,24 +44,22 @@ fun EventDetailsPage(context: Context, event: EventData, onBack: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(WhiteLigth)
+            .fillMaxSize()
     ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = selectedEvent?.name ?: "Event Details",
-                    fontSize = 24.sp // Larger font size
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(WhiteLigth)
-        )
+
 
         selectedEvent?.let { event ->
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
+                Text(
+                    text = selectedEvent?.name ?: "Event Details",
+                    fontSize = 24.sp, // Larger font size
+
+
+                )
                 val startDate = event.dates?.start?.localDate ?: "No date available"
                 val startTime = event.dates?.start?.localTime ?: "No starting time available"
                 Text(
@@ -130,12 +130,17 @@ fun EventDetailsPage(context: Context, event: EventData, onBack: () -> Unit) {
                 }
 
                 Button(onClick = {
-                    val uri = Uri.parse(event.url)
-                    val builder = CustomTabsIntent.Builder()
-                    val costumTabsIntent = builder.build()
-                    println("HEre $uri")
-                    val intent = Intent(Intent.ACTION_VIEW, uri)
-                    costumTabsIntent.launchUrl(context, Uri.parse(event.url))
+                    try {
+                        val uri = Uri.parse(event.url)
+                        println("HEre $uri")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                        Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                    }
+
                 },
 
                     colors = ButtonDefaults.buttonColors(Color.Green.copy(alpha = 0.7f)),
