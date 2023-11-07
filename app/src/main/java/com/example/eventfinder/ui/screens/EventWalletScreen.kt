@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.eventfinder.data.models.EventData
+import com.example.eventfinder.ui.theme.BlueLitgh
+import com.example.eventfinder.ui.theme.WhiteLigth
 
 @Composable
 fun EventWalletPage(
@@ -48,7 +50,7 @@ fun EventWalletPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp) // Adjusted height for additional space
-                .background(Color.LightGray)
+                .background(Color.White)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)

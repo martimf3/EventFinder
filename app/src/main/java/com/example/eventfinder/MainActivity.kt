@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                     selectedIcon = Icons.Filled.Favorite,
                     unselectedIcon = Icons.Outlined.FavoriteBorder,
                     hasNews = false,
-                    badgeCount = 2,
+
                 ),
                 BottomNavigationItem(
                     title = "Profile",

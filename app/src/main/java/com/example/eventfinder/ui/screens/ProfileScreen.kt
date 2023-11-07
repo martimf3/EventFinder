@@ -1,20 +1,34 @@
 package com.example.eventfinder.ui.screens
 
 import android.util.Log
+
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,9 +40,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -37,6 +58,9 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.eventfinder.*
 import com.example.eventfinder.auth.googleauth.sign_in.UserData
+import com.example.eventfinder.ui.theme.BlueLitgh
+import com.example.eventfinder.ui.theme.GreenLigth
+import com.example.eventfinder.ui.theme.WhiteLigth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -58,104 +82,174 @@ fun ProfileScreen(
     var confirmationText by remember { mutableStateOf("") }
     var showOptions by remember { mutableStateOf(false) }
 
-    
-    LaunchedEffect(Unit){
+
+
+    LaunchedEffect(Unit) {
         val userDoc = db.collection("users").document(userID).get().await()
         userData = userDoc.toObject(UserData::class.java)
     }
 
-    userData?.let {user ->
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(WhiteLigth)
+            .fillMaxWidth()
 
-    ) {
-
-
-        user.profilePictureUrl?.let { url ->
-            AsyncImage(
-                model = url,
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-
+    )
+    Canvas(
+        modifier = Modifier,
+        onDraw = {
+            drawRoundRect(
+                color = BlueLitgh,
+                cornerRadius = CornerRadius(0f, 30f),
+                size = Size(1500f, 900f)
             )
-
         }
+    )
+    userData?.let { user ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
 
+        ) {
+            Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        user.username?.let { username ->
             Text(
-                text = username,
+                text = "Profile",
                 textAlign = TextAlign.Center,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.SemiBold
             )
 
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        user.userEmail?.let { email ->
-            Text(
-                text = email,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
+            Spacer(modifier = Modifier.height(15.dp))
+            user.profilePictureUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
 
                 )
 
-        }
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        user.userPhoneNumber?.let { phone ->
+            Spacer(modifier = Modifier.height(40.dp))
+
             Text(
-                text = phone,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp
+                text = "Name:",
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif
+                )
+            )
+            
+            Spacer(modifier = Modifier.height(10.dp))
+
+            user.username?.let { username ->
+                Text(
+                    text = username,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+
+                )
+
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "Email:",
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif
+                )
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            user.userEmail?.let { email ->
+                Text(
+                    text = email,
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+
+
+                    )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Phone Number:",
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif
+                )
             )
 
-        }
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            user.userPhoneNumber?.let { phone ->
+                if(phone.isNotBlank()){
+                    Text(
+                        text = phone,
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
 
+                }else{
+                    Text(
+                        text = "N/A",
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
 
-    }
-    }
-    Button(onClick = {
-        if (confirmationText.uppercase() == keyword) {
-            db.collection("users").document(userID)
-                .delete()
-                .addOnSuccessListener {
-                    Log.d("ProfileDeletion", "User data deleted from Firestore")
-                    firebaseAuth.currentUser?.delete()
-                    navController.navigate("sign_in")
                 }
+
+
+            }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Settings:",
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif
+                )
+            )
+
+            IconButton(onClick = { showOptions = true},
+                modifier = Modifier.size(50.dp)) {
+                    Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
+
+                }
+
+
+
+            }
+            
         }
-    }) {
-        Text(text = "Delete Profile")
-    }
 
-    Button(onClick = { showOptions = true }) {
-        Text(text = "Options")
-
-    }
-
-    if(showOptions){
+    if (showOptions) {
         AlertDialog(
+
             properties = DialogProperties(usePlatformDefaultWidth = false),
             onDismissRequest = { showOptions = false },
-            title = { Text(text = "Options") },
-            confirmButton = { 
-                Button(onClick = { showOptions = false }) {
-                    Text(text = "Close")
+            containerColor = WhiteLigth,
+            title = { Text(text = "Settings") },
+            confirmButton = {
+                IconButton(onClick = { showOptions = false},
+                    modifier = Modifier.scale(2f)){
+                    Icon(imageVector = Icons.Filled.Close, contentDescription = "Close", tint = Color.Black )
                 }
+
             },
             text = {
                 // Options Inside Dialog
@@ -193,15 +287,31 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button(onClick = { onSignOut() }) {
-                            Text(text = "Sign Out")
+                        Button(
+                            onClick = { navController.navigate("update") },
+                            colors = ButtonDefaults.buttonColors(GreenLigth)) {
+                            Text(text = "Update",
+                                style = TextStyle(
+                                    fontFamily = FontFamily.Serif,
+                                    fontSize = 20.sp
+                                )
+                            )
+
                         }
+
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button(onClick = { navController.navigate("update") }) {
-                            Text(text = "Update")
-
+                        Button(onClick = { onSignOut() },
+                            colors = ButtonDefaults.buttonColors(GreenLigth)) {
+                            Text(text = "Sign Out",
+                                style = TextStyle(
+                                    fontFamily = FontFamily.Serif,
+                                    fontSize = 20.sp
+                                )
+                            )
+                            Spacer(modifier = Modifier.padding(4.dp))
+                            Icon(imageVector = Icons.Filled.ExitToApp, contentDescription = "Sign Out")
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -209,10 +319,14 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = confirmationText,
                             onValueChange = { confirmationText = it },
-                            label = { Text("Type '$keyword' for Profile Elimination",
-                                textAlign = TextAlign.Center) },
+                            label = {
+                                Text(
+                                    "Type '$keyword' for Profile Elimination",
+                                    textAlign = TextAlign.Center
+                                )
+                            },
                             modifier = Modifier
-                                .size(350.dp,55.dp)
+                                .size(350.dp, 55.dp)
 
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -227,13 +341,10 @@ fun ProfileScreen(
                                         navController.navigate("sign_in")
                                     }
                             }
-                        }) {
+                        },
+                            colors = ButtonDefaults.buttonColors(Color.Red.copy(alpha = 0.5f))) {
                             Text(text = "Delete Profile")
                         }
-
-
-
-
 
 
                     }
@@ -241,7 +352,8 @@ fun ProfileScreen(
                 }
 
 
-            }
+            },
+
         )
     }
 

@@ -1,7 +1,9 @@
 package com.example.eventfinder.ui.screens
 
 import android.content.Context
+import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,9 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -469,10 +475,12 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                     AlertDialog(
                         properties = DialogProperties(usePlatformDefaultWidth = false), // Ensure a custom width
                         onDismissRequest = { showEventDetails = false },
+                        containerColor = WhiteLigth,
                         title = { Text(text = "Event Details") },
                         confirmButton = {
-                            Button(onClick = { showEventDetails = false }) {
-                                Text(text = "Close")
+                            IconButton(onClick = { showEventDetails = false},
+                                modifier = Modifier.scale(2f)){
+                                Icon(imageVector = Icons.Filled.Close, contentDescription = "Close", tint = Color.Black )
                             }
                         },
                         text = {
@@ -482,8 +490,28 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                                 EventDetailsPage(context, event) {
                                     showEventDetails = false
                                 }
+                                Button(onClick = {
+                                    val uri = Uri.parse(event.url)
+                                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                                    if (intent.resolveActivity(context.packageManager) != null){
+                                        context.startActivity(intent)
+                                    }
+                                },
+                                    colors = ButtonDefaults.buttonColors(Color.Green.copy(alpha = 0.7f))
+                                    ) {
+                                    Text(text = "Buy",
+                                        style = TextStyle(
+                                            fontFamily = FontFamily.Serif,
+                                            fontSize = 20.sp
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.padding(4.dp))
+                                    Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = "buy" )
+
+                                }
                             }
                         }
+                        
                     )
                 }
 
