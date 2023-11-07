@@ -387,7 +387,45 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                                                     ),
                                                     "family" to classification.family
                                                 )
+
                                             },
+
+                                            "embedded" to mapOf(
+                                                "events" to event._embedded?.events?.map { },
+                                                "venues" to event._embedded?.venues?.map {venue ->
+                                                    mapOf(
+                                                        "name" to venue.name,
+                                                        "type" to venue.type,
+                                                        "id" to venue.id,
+                                                        "test" to venue.test,
+                                                        "url" to venue.url,
+                                                        "locale" to venue.locale,
+                                                        "distance" to venue.distance,
+                                                        "units" to venue.units,
+                                                        "postalCode" to venue.postalCode,
+                                                        "timezone" to venue.timezone,
+                                                        "city" to mapOf("name" to venue.city.name),
+                                                        "state" to mapOf("name" to venue.state.name),
+                                                        "country" to mapOf(
+                                                            "name" to venue.country.name,
+                                                            "countryCode" to venue.country.countryCode
+                                                        ),
+                                                        "address" to mapOf("line1" to venue.address.line1),
+                                                        "location" to mapOf(
+                                                            "longitude" to venue.location.longitude,
+                                                            "latitude" to venue.location.latitude
+                                                        ),
+                                                        "upcomingEvents" to mapOf(
+                                                            "mfx_es" to venue.upcomingEvents.mfx_es,
+                                                            "_total" to venue.upcomingEvents._total,
+                                                            "_filtered" to venue.upcomingEvents._filtered
+                                                        ),
+
+                                                    )
+
+                                                }
+                                                // Outros dados incorporados, se houver
+                                            )
 
                                             )
                                     )
@@ -476,7 +514,7 @@ suspend fun performSearch(radius: Double, useDeviceLocation: Boolean, context: C
                 }
             }
         }else{
-            //loc = selectedLocation  TODO
+
         }
     }
 }

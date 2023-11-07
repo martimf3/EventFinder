@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                     selectedIcon = Icons.Filled.Favorite,
                     unselectedIcon = Icons.Outlined.FavoriteBorder,
                     hasNews = false,
-                    badgeCount = 0,
+                    badgeCount = 2,
                 ),
                 BottomNavigationItem(
                     title = "Profile",
@@ -338,14 +338,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-suspend fun events(googleAuthUiClient: GoogleAuthUiClient): List<EventData> {
-    val userId = googleAuthUiClient.getSignedInUser()?.userId.toString()
-    val existingDoc =
-        Firebase.firestore.collection("users").document(userId).collection("wishlist").get().await()
-
-    return existingDoc.toObjects(EventData::class.java)
-
-}
 
 class EventViewModel : ViewModel() {
     private val _events = MutableStateFlow<List<EventData>>(emptyList())
