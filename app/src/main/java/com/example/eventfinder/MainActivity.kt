@@ -96,13 +96,6 @@ class MainActivity : ComponentActivity() {
             val items = listOf(
                 BottomNavigationItem(
                     title = "Events",
-                    route = "home",
-                    selectedIcon = Icons.Filled.Home,
-                    unselectedIcon = Icons.Outlined.Home,
-                    hasNews = false,
-                ),
-                BottomNavigationItem(
-                    title = "Events Search",
                     route = "eventSearch",
                     selectedIcon = Icons.Filled.Search,
                     unselectedIcon = Icons.Outlined.Search,
@@ -114,7 +107,7 @@ class MainActivity : ComponentActivity() {
                     selectedIcon = Icons.Filled.Favorite,
                     unselectedIcon = Icons.Outlined.FavoriteBorder,
                     hasNews = false,
-                    badgeCount = 3,
+                    badgeCount = 0,
                 ),
                 BottomNavigationItem(
                     title = "Profile",
@@ -187,15 +180,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-
-
             NavHost(navController = navController, startDestination = "distinction") {
 
 
                 composable("distinction") {
 
                     if (isLoggedIn) {
-                        navController.navigate("home")
+                        navController.navigate("eventSearch")
                     }
 
                     if(!isLoggedIn){
@@ -233,7 +224,7 @@ class MainActivity : ComponentActivity() {
                                 "Sign In Successful",
                                 Toast.LENGTH_LONG
                             ).show()
-                            navController.navigate("home")
+                            navController.navigate("eventSearch")
 
                         }
                     }
@@ -285,11 +276,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-                //HOME NAVBAR -> Should Be Placed a Navbar here, with our homepage, and the navBar on Bottom
-                composable("home") {
-                    HomeScreen(navController)
 
-                }
                 //Update Profile
                 composable("update"){
                     val db = FirebaseFirestore.getInstance()
@@ -297,7 +284,7 @@ class MainActivity : ComponentActivity() {
 
                     val onProfileUpdated: (Boolean) -> Unit = { result->
                         if (result){
-                            Toast.makeText(applicationContext, "Perfil Successfuly Updated", Toast.LENGTH_LONG).show()
+                            Toast.makeText(applicationContext, "Profile Successfuly Updated", Toast.LENGTH_LONG).show()
                         }else{
                             Toast.makeText(applicationContext,"Error Updating Profile", Toast.LENGTH_LONG).show()
                         }
