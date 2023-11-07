@@ -44,8 +44,10 @@ import com.example.eventfinder.location.*
 import com.example.eventfinder.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -204,6 +206,7 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
     val firstImage = event.images?.firstOrNull() // Retrieve the first image if available
     var showEventDetails by remember { mutableStateOf(false) }
 
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,14 +301,81 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                     IconButton(onClick = {
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         val eventId = event.id
+                        val userId = currentUser?.uid.toString()
+                        val addUserEvent = Firebase.firestore.collection("users").document(userId).collection("wishlist")
 
+                        addUserEvent.document(eventId)
+                            .set(mapOf(
+                                "name" to event.name,
+                                "type" to event.type,
+                                "id" to event.id,
+                                "test" to event.test,
+                                "url" to event.url,
+                                "locale" to event.locale,
+                                "distance" to event.distance,
+                                "units" to event.units,
+                                // Mapear as imagens do evento se houver
+                                "images" to event.images?.map { image ->
+                                    mapOf(
+                                        "ratio" to image.ratio,
+                                        "url" to image.url,
+                                        "width" to image.width,
+                                        "height" to image.height,
+                                        "fallback" to image.fallback
+                                    )
+                                },
+                                "sales" to mapOf(
+                                    "public" to mapOf(
+                                        "startDateTime" to event.sales?.public?.startDateTime,
+                                        "startTBD" to event.sales?.public?.startTBD,
+                                        "startTBA" to event.sales?.public?.startTBA,
+                                        "endDateTime" to event.sales?.public?.endDateTime
+                                    )
+                                ),
+                                "dates" to mapOf(
+                                    "start" to mapOf(
+                                        "localDate" to event.dates?.start?.localDate,
+                                        "localTime" to event.dates?.start?.localTime,
+                                        "dateTime" to event.dates?.start?.dateTime,
+                                        "dateTBD" to event.dates?.start?.dateTBD,
+                                        "dateTBA" to event.dates?.start?.dateTBA,
+                                        "timeTBA" to event.dates?.start?.timeTBA,
+                                        "noSpecificTime" to event.dates?.start?.noSpecificTime
+                                    ),
+                                    "timezone" to event.dates?.timezone,
+                                    "status" to mapOf(
+                                        "code" to event.dates?.status?.code
+                                    ),
+                                    "spanMultipleDays" to event.dates?.spanMultipleDays
+                                ),
+                                "classifications" to event.classifications?.map { classification ->
+                                    mapOf(
+                                        "primary" to classification.primary,
+                                        "segment" to mapOf(
+                                            "id" to classification.segment.id,
+                                            "name" to classification.segment.name
+                                        ),
+                                        "genre" to mapOf(
+                                            "id" to classification.genre.id,
+                                            "name" to classification.genre.name
+                                        ),
+                                        "subGenre" to mapOf(
+                                            "id" to classification.subGenre.id,
+                                            "name" to classification.subGenre.name
+                                        ),
+                                        "type" to mapOf(
+                                            "id" to classification.type.id,
+                                            "name" to classification.type.name
+                                        ),
+                                        "subType" to mapOf(
+                                            "id" to classification.subType.id,
+                                            "name" to classification.subType.name
+                                        ),
+                                        "family" to classification.family
+                                    )
+                                },
 
-                        if (currentUser != null){
-                            val userId = currentUser.uid
-                            val userDoc = Firebase.firestore.collection("users").document(userId)
-                            userDoc.update("wishlist", FieldValue.arrayUnion(eventId))
-
-                        }
+                            ))
 
                     },
                         modifier = Modifier
@@ -373,6 +443,7 @@ suspend fun performSearch(radius: Double, useDeviceLocation: Boolean, context: C
         }
     }
 }
+
 
 
 
