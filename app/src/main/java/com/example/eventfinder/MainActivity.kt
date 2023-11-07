@@ -17,9 +17,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -30,12 +28,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,19 +45,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
-import com.example.eventfinder.ui.screens.HomeScreen
 import com.example.eventfinder.ui.screens.ProfileScreen
 import com.example.eventfinder.ui.screens.SignInScreen
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
+import com.example.eventfinder.data.models.EventData
+import com.example.eventfinder.ui.screens.EventWalletPage
 import com.example.eventfinder.ui.screens.EventsSearchPage
 import com.example.eventfinder.ui.screens.SignUpScreen
 import com.example.eventfinder.ui.screens.UpdateProfile
 import com.example.eventfinder.ui.theme.BlueLitgh
 import com.example.eventfinder.ui.theme.WhiteLigth
 import com.google.firebase.firestore.FirebaseFirestore
-
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 
 data class BottomNavigationItem(
@@ -79,6 +87,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         val context = MyApplication.applicationContext()
+        val eventViewModel = ViewModelProvider(this).get(EventViewModel::class.java)
 
         super.onCreate(savedInstanceState)
 
@@ -107,7 +116,7 @@ class MainActivity : ComponentActivity() {
                     selectedIcon = Icons.Filled.Favorite,
                     unselectedIcon = Icons.Outlined.FavoriteBorder,
                     hasNews = false,
-                    badgeCount = 0,
+
                 ),
                 BottomNavigationItem(
                     title = "Profile",
@@ -306,6 +315,13 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("wishList") {
+                    LaunchedEffect(key1 = true) {
+                        eventViewModel.fetchEvents(googleAuthUiClient)
+                    }
+
+                    val eventList by eventViewModel.events.collectAsState(initial = emptyList())
+                    println("aqui: ${eventList.count()}")
+                    EventWalletPage(navController, context,eventList)
 
                 }
 
@@ -321,6 +337,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+class EventViewModel : ViewModel() {
+    private val _events = MutableStateFlow<List<EventData>>(emptyList())
+    val events: StateFlow<List<EventData>> = _events
+
+    suspend fun fetchEvents(googleAuthUiClient: GoogleAuthUiClient) {
+        withContext(Dispatchers.IO) {
+            val userId = googleAuthUiClient.getSignedInUser()?.userId.toString()
+            val existingDoc = Firebase.firestore.collection("users").document(userId).collection("wishlist").get().await()
+            val eventsList = existingDoc.toObjects(EventData::class.java)
+            _events.value = eventsList
+        }
+    }
+}
+
 
 
 
