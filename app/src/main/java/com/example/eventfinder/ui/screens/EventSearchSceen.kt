@@ -490,25 +490,8 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
                                 EventDetailsPage(context, event) {
                                     showEventDetails = false
                                 }
-                                Button(onClick = {
-                                    val uri = Uri.parse(event.url)
-                                    val intent = Intent(Intent.ACTION_VIEW, uri)
-                                    if (intent.resolveActivity(context.packageManager) != null){
-                                        context.startActivity(intent)
-                                    }
-                                },
-                                    colors = ButtonDefaults.buttonColors(Color.Green.copy(alpha = 0.7f))
-                                    ) {
-                                    Text(text = "Buy",
-                                        style = TextStyle(
-                                            fontFamily = FontFamily.Serif,
-                                            fontSize = 20.sp
-                                        )
-                                    )
-                                    Spacer(modifier = Modifier.padding(4.dp))
-                                    Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = "buy" )
 
-                                }
+
                             }
                         }
                         
