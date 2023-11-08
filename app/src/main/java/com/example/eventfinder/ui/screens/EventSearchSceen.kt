@@ -1,9 +1,8 @@
 package com.example.eventfinder.ui.screens
 
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.location.Location
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,8 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,20 +43,16 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.eventfinder.data.api.ticketMaster.getEvents
 import com.example.eventfinder.data.models.EventData
+import com.example.eventfinder.data.models.SearchViewModel
 import com.example.eventfinder.location.*
 import com.example.eventfinder.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventsSearchPage(navController: NavController, context: Context) {
+fun EventsSearchPage(navController: NavController, context: Context, viewModel: SearchViewModel) {
     var radius by remember { mutableStateOf(50.0) }
     var useDeviceLocation by remember { mutableStateOf(true) }
     var searchResults by remember { mutableStateOf<List<EventData>?>(null) }
@@ -99,7 +91,10 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                         Text("Search Radius: ${radius.toInt()} km")
                         Slider(
                             value = radius.toFloat(),
-                            onValueChange = { radius = it.toDouble() },
+                            onValueChange = {
+                                radius = it.toDouble()
+                                viewModel.setRadius(it.toDouble())
+                                            },
                             valueRange = 50.0f..200.0f,
                             steps = 150,
                             modifier = Modifier.fillMaxWidth(),
@@ -107,8 +102,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                                 thumbColor = Color.Black,
                                 activeTrackColor = Color.Black,
                                 inactiveTrackColor = Color.Transparent
-                            )
-
+                            ),
                         )
                     }
                 }
@@ -126,6 +120,7 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                             checked = useDeviceLocation,
                             onCheckedChange = {
                                 useDeviceLocation = it
+                                viewModel.setUseDeviceLocation(it)
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
@@ -152,19 +147,13 @@ fun EventsSearchPage(navController: NavController, context: Context) {
                                 .scale(1.3f,1.3f),)
                     }
                     LaunchedEffect(key) {
-                        println("antes if")
                         if (key > 0) {
-                            println("1")
                             searching = true
-                            println("2")
-                            val results = performSearch(radius, useDeviceLocation, context)
-                            println("3")
-                            searchResults = results
-                            println("4")
-                            searching = false
-                            println("5")
-                            showNoEventsFound = results.isEmpty()
-
+                            performSearch(radius, useDeviceLocation, context) { results ->
+                                searchResults = results
+                                searching = false
+                                showNoEventsFound = results?.isEmpty() == true
+                            }
                         }
                     }
                 }
@@ -504,32 +493,39 @@ fun EventCard(context: Context, event: EventData, navController: NavController, 
     }
 }
 
-suspend fun performSearch(radius: Double, useDeviceLocation: Boolean, context: Context): List<EventData> {
-    return suspendCoroutine { continuation ->
-        var loc = Location("empty")
-        val locationService = LocationService(context)
+suspend fun performSearch(
+    radius: Double,
+    useDeviceLocation: Boolean,
+    context: Context,
+    onSearchResults: (List<EventData>?) -> Unit
+) {
+    println("PerformSearch, Perform Search Started")
 
-        if (useDeviceLocation){
-            locationService.getLastLocation(context) { location ->
-                if (location != null) {
-                    //println("lat: ${location.latitude}, long: ${location.longitude}")
-                    loc = location
-                    getEvents(loc, radius.toInt()) { eventList ->
-                        // Handle the list of events here
-                        if (eventList != null) {
-                            continuation.resume(eventList)
-                        } else {
-                            continuation.resume(emptyList())
-                        }
-                    }
-                }
+    val locationService = LocationService(context)
+
+    val onLocationReceived: (Location?) -> Unit = { location ->
+        println("PerformSearch, Location Received: $location")
+        if (location != null || useDeviceLocation) {
+            println()
+            val loc = location ?: Location("empty")
+
+            getEvents(loc, radius.toInt()) { eventList ->
+                onSearchResults(eventList)
             }
-        }else{
-
+        } else {
+            println("PerformSearch, Location not available")
+            onSearchResults(emptyList())
         }
     }
+
+    if (context is Activity) {
+        println("PerformSearch, Getting Last Location")
+        locationService.getLastLocation() { location ->
+            onLocationReceived(location)
+        }
+    } else {
+        println("PerformSearch, Context is not an Activity")
+        onSearchResults(emptyList())
+    }
 }
-
-
-
 

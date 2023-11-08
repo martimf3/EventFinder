@@ -1,5 +1,6 @@
 package com.example.eventfinder
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -7,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,9 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -45,24 +47,27 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventfinder.auth.googleauth.sign_in.GoogleAuthUiClient
 import com.example.eventfinder.auth.googleauth.sign_in.SignInViewModel
-import com.example.eventfinder.ui.screens.ProfileScreen
-import com.example.eventfinder.ui.screens.SignInScreen
-import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.launch
 import com.example.eventfinder.data.api.ticketMaster.*
 import com.example.eventfinder.data.models.EventData
+import com.example.eventfinder.data.models.SearchViewModel
+import com.example.eventfinder.location.LocationService
 import com.example.eventfinder.ui.screens.EventWalletPage
 import com.example.eventfinder.ui.screens.EventsSearchPage
+import com.example.eventfinder.ui.screens.ProfileScreen
+import com.example.eventfinder.ui.screens.SignInScreen
 import com.example.eventfinder.ui.screens.SignUpScreen
 import com.example.eventfinder.ui.screens.UpdateProfile
+import com.example.eventfinder.ui.screens.performSearch
 import com.example.eventfinder.ui.theme.BlueLitgh
 import com.example.eventfinder.ui.theme.WhiteLigth
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -85,8 +90,11 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+
+    private val searchViewModel: SearchViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val context = MyApplication.applicationContext()
+        val context = this
         val eventViewModel = ViewModelProvider(this).get(EventViewModel::class.java)
 
         super.onCreate(savedInstanceState)
@@ -311,7 +319,8 @@ class MainActivity : ComponentActivity() {
 
                 // Teste Navegacao da Aplicacao
                 composable("eventSearch") {
-                    EventsSearchPage(navController, context)
+                    var searchViewModel = SearchViewModel()
+                    EventsSearchPage(navController, context, searchViewModel)
                 }
 
                 composable("wishList") {
@@ -334,6 +343,38 @@ class MainActivity : ComponentActivity() {
             }
 
 
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        val locationService = LocationService(context)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == locationService.LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permissão concedida, agora podemos chamar o serviço de localização
+                locationService.getLastLocation { location ->
+                    // Aqui você pode realizar a pesquisa usando a localização obtida
+                    // Chame a função performSearch passando a localização
+                    val radius = searchViewModel.radius.value
+                    val useDeviceLocation = searchViewModel.useDeviceLocation.value
+                    lifecycleScope.launch {
+                        if (radius != null) {
+                            if (useDeviceLocation != null) {
+                                performSearch(radius, useDeviceLocation, context) { searchResults ->
+                                    // Aqui você recebe os resultados da pesquisa // Faça o que for necessário com os resultados
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Permissão negada. Você pode tratar isso de acordo com sua lógica.
+                // Por exemplo, mostrando uma mensagem ao usuário.
+            }
         }
     }
 }
