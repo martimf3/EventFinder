@@ -14,11 +14,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.eventfinder.MainActivity
-import com.example.eventfinder.MyApplication
 import com.example.eventfinder.R
 
-class Notifications {
-    private val context : Context = MyApplication.applicationContext()
+class Notifications (context: Context) {
+    private val context = context
     private val CHANNEL_ID = "channel_id_0"
     private val notificationId = 101
 
